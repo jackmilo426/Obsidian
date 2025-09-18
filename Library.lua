@@ -1756,7 +1756,7 @@ local BaseAddons = {}
 do
     local Funcs = {}
 
-    function Funcs:AddKeyPicker(Idx, Info)
+	function Funcs:AddKeyPicker(Idx, Info)
     Info = Library:Validate(Info, Templates.KeyPicker)
 
     local ParentObj = self
@@ -1987,15 +1987,10 @@ do
                 KeybindsToggle:SetVisibility(false)
             else
                 KeybindsToggle:SetVisibility(true)
-                local modeStr = ""
-                if KeyPicker.Mode == "Toggle" then
-                    modeStr = " [T]"
-                elseif KeyPicker.Mode == "Hold" then
-                    modeStr = " [H]"
-                end
+                local modeStr = string.format(" (%s)", KeyPicker.Mode:sub(1, 1):upper())
                 local text = KeybindsToggle.Normal and
-                    string.format("[%s]%s - %s", KeyPicker.Value, modeStr, KeyPicker.Text) or
-                    string.format("[%s]%s %s", KeyPicker.Value, modeStr, KeyPicker.Text)
+                    string.format("[%s] - %s%s", KeyPicker.Value, KeyPicker.Text, modeStr) or
+                    string.format("[%s] %s%s", KeyPicker.Value, KeyPicker.Text, modeStr)
                 KeybindsToggle:SetText(text)
             end
 
