@@ -111,6 +111,7 @@ local ObsidianImageManager = {
         }
     }
 }
+
 do
     local BaseURL = "https://raw.githubusercontent.com/jackmilo426/Obsidian/refs/heads/main/"
 
