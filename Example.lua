@@ -22,11 +22,16 @@ local Window = Library:CreateWindow({
 	-- Position and Size are also valid options here
 	-- but you do not need to define them unless you are changing them :)
 
-	Title = "mspaint",
+	Title = "alexscriptx",
+    Icon = 14608990905,
 	Footer = "version: example",
-	Icon = 95816097006870,
-	NotifySide = "Right",
-	ShowCustomCursor = true,
+	ToggleKeybind = Enum.KeyCode.Z,
+    Center = true,
+    AutoShow = true,
+    ShowCustomCursor = false,
+    Font = Enum.Font.Gotham,
+    CornerRadius = 15,
+    DisableSearch = false
 })
 
 -- CALLBACK NOTE:
@@ -704,7 +709,7 @@ MenuGroup:AddDropdown("NotificationSide", {
 	end,
 })
 MenuGroup:AddDropdown("DPIDropdown", {
-	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Values = { "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "100%", "110%", "120%", "130%", "140%", "150%", "160%", "170%", "180%", "190%", "200%", "225%", "250%", "275%", "300%", "325%", "350%", "375%", "400%", "425%", "450%", "475%", "500%" }
 	Default = "100%",
 
 	Text = "DPI Scale",
@@ -718,7 +723,7 @@ MenuGroup:AddDropdown("DPIDropdown", {
 })
 MenuGroup:AddDivider()
 MenuGroup:AddLabel("Menu bind")
-	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+	:AddKeyPicker("MenuKeybind", { Default = "Z", NoUI = true, Text = "Menu keybind" })
 
 MenuGroup:AddButton("Unload", function()
 	Library:Unload()
