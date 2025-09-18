@@ -404,7 +404,7 @@ do
         ["Marshmallow"] = {
             61,
             httpService:JSONDecode(
-                [[{"FontColor":"1a1a1a","MainColor":"fce4ec","AccentColor":"f8bbd0","BackgroundColor":"3a2525","OutlineColor":"7a5555"}]]
+                [[{"FontColor":"000000","MainColor":"eccbea","AccentColor":"f8bbd0","BackgroundColor":"e4dfdf","OutlineColor":"96a8d7"}]]
             ),
         },
         ["Jade Forest"] = {
