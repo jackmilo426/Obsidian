@@ -146,24 +146,16 @@ do
         end
 
         local AssetID = `rbxassetid://{AssetData.RobloxId}`
-
-        if getcustomasset then
-            local Success, NewID = pcall(getcustomasset, AssetData.Path)
-
-            if Success and NewID then
-                AssetID = NewID
-            end
-        end
-
+		
         AssetData.Id = AssetID
         return AssetID
     end
 
     function ObsidianImageManager.DownloadAsset(AssetPath: string)
-        if not getcustomasset or not writefile or not isfile then
+        if not writefile or not isfile then
             return
         end
-
+		
         RecursiveCreatePath(AssetPath, true)
 
         if isfile(AssetPath) then
