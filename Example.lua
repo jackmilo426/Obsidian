@@ -693,7 +693,7 @@ MenuGroup:AddToggle("KeybindMenuOpen", {
 })
 MenuGroup:AddToggle("ShowCustomCursor", {
 	Text = "Custom Cursor",
-	Default = true,
+	Default = false,
 	Callback = function(Value)
 		Library.ShowCustomCursor = Value
 	end,
@@ -709,7 +709,7 @@ MenuGroup:AddDropdown("NotificationSide", {
 	end,
 })
 MenuGroup:AddDropdown("DPIDropdown", {
-	Values = { "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "100%", "110%", "120%", "130%", "140%", "150%", "160%", "170%", "180%", "190%", "200%", "225%", "250%", "275%", "300%", "325%", "350%", "375%", "400%", "425%", "450%", "475%", "500%" },
+	Values = { "75%", "80%", "85%", "90%", "95%", "100%", "110%", "120%", "130%", "140%", "150%", "160%", "170%", "180%", "190%", "200%" },
 	Default = "100%",
 
 	Text = "DPI Scale",
