@@ -156,9 +156,9 @@ do
             ),
         },
         ["Solar Flare"] = {
-            20,
-            httpService:JSONDecode(
-                [[{"FontColor":"ffffff","MainColor":"4e1609","AccentColor":"ff7043","BackgroundColor":"2b0702","OutlineColor":"6f1e07"}]]
+        20,
+        httpService:JSONDecode(
+            [[{"FontColor":"ffffff","MainColor":"4e1609","AccentColor":"ff7043","BackgroundColor":"2b0702","OutlineColor":"6f1e07"}]]
             ),
         },
         ["Aurora"] = {
@@ -176,7 +176,7 @@ do
         ["Sunset Horizon"] = {
             23,
             httpService:JSONDecode(
-                [[{"FontColor":"fff8f0","MainColor":"ff6f61","AccentColor":"fbc687","BackgroundColor":"3a1a1a","OutlineColor":"7b3f39"}]]
+                [[{"FontColor":"ffffff","MainColor":"ff6f61","AccentColor":"fbc687","BackgroundColor":"3a1a1a","OutlineColor":"7b3f39"}]]
             ),
         },
         ["Retro Wave"] = {
@@ -206,7 +206,7 @@ do
         ["Vintage Paper"] = {
             28,
             httpService:JSONDecode(
-                [[{"FontColor":"3b2f2f","MainColor":"d8cfc4","AccentColor":"b89c73","BackgroundColor":"f3e9d2","OutlineColor":"a68f7c"}]]
+                [[{"FontColor":"2f2f2f","MainColor":"d8cfc4","AccentColor":"b89c73","BackgroundColor":"f3e9d2","OutlineColor":"a68f7c"}]]
             ),
         },
         ["Neon Jungle"] = {
@@ -242,7 +242,7 @@ do
         ["Flame Ember"] = {
             34,
             httpService:JSONDecode(
-                [[{"FontColor":"ffffff","MainColor":"692423","AccentColor":"ff7043","BackgroundColor":"3b1f1f","OutlineColor":"8b3a3a"}]]
+                [[{"FontColor":"ffffff","MainColor":"692423","AccentColor":"ff7043","BackgroundColor":"2e0005","OutlineColor":"8b3a3a"}]]
             ),
         },
         ["Glacial"] = {
@@ -278,7 +278,7 @@ do
         ["Peach Fuzz"] = {
             40,
             httpService:JSONDecode(
-                [[{"FontColor":"3b2f2f","MainColor":"ffc1a1","AccentColor":"ff8e72","BackgroundColor":"4a2f2f","OutlineColor":"7f5a56"}]]
+                [[{"FontColor":"2f2f2f","MainColor":"ffc1a1","AccentColor":"ff8e72","BackgroundColor":"4a2f2f","OutlineColor":"7f5a56"}]]
             ),
         },
         ["Slate Grey"] = {
@@ -296,7 +296,7 @@ do
         ["Electric Lime"] = {
             43,
             httpService:JSONDecode(
-                [[{"FontColor":"000000","MainColor":"c6ff00","AccentColor":"aeea00","BackgroundColor":"1a1a1a","OutlineColor":"4f4f4f"}]]
+                [[{"FontColor":"000000","MainColor":"c6ff00","AccentColor":"aeea00","BackgroundColor":"333333","OutlineColor":"4f4f4f"}]]
             ),
         },
         ["Twilight"] = {
@@ -344,7 +344,7 @@ do
         ["Peanut Butter"] = {
             51,
             httpService:JSONDecode(
-                [[{"FontColor":"3b2f2f","MainColor":"e1a95f","AccentColor":"ffca80","BackgroundColor":"362b21","OutlineColor":"7a6326"}]]
+                [[{"FontColor":"2f2f2f","MainColor":"e1a95f","AccentColor":"ffca80","BackgroundColor":"362b21","OutlineColor":"7a6326"}]]
             ),
         },
         ["Ocean Pearl"] = {
@@ -386,7 +386,7 @@ do
         ["Vodka Lime"] = {
             58,
             httpService:JSONDecode(
-                [[{"FontColor":"000000","MainColor":"ccff66","AccentColor":"99ff33","BackgroundColor":"e6ffe6","OutlineColor":"aaff99"}]]
+                [[{"FontColor":"000000","MainColor":"ccff66","AccentColor":"99ff33","BackgroundColor":"333333","OutlineColor":"4f4f4f"}]]
             ),
         },
         ["Stormy Night"] = {
@@ -404,7 +404,7 @@ do
         ["Marshmallow"] = {
             61,
             httpService:JSONDecode(
-                [[{"FontColor":"3b2f2f","MainColor":"fce4ec","AccentColor":"f8bbd0","BackgroundColor":"4a2f2f","OutlineColor":"7a5555"}]]
+                [[{"FontColor":"2f2f2f","MainColor":"fce4ec","AccentColor":"f8bbd0","BackgroundColor":"4a2f2f","OutlineColor":"7a5555"}]]
             ),
         },
         ["Jade Forest"] = {
@@ -422,7 +422,7 @@ do
         ["Desert Storm"] = {
             64,
             httpService:JSONDecode(
-                [[{"FontColor":"3b2f2f","MainColor":"e8ddcb","AccentColor":"cdb79e","BackgroundColor":"392d24","OutlineColor":"7a6858"}]]
+                [[{"FontColor":"2f2f2f","MainColor":"e8ddcb","AccentColor":"cdb79e","BackgroundColor":"392d24","OutlineColor":"7a6858"}]]
             ),
         },
         ["Tropical Punch"] = {
@@ -446,7 +446,7 @@ do
         ["Candy Cane"] = {
             68,
             httpService:JSONDecode(
-                [[{"FontColor":"ff0000","MainColor":"ffffff","AccentColor":"00aa00","BackgroundColor":"000000","OutlineColor":"660000"}]]
+                [[{"FontColor":"ffffff","MainColor":"ffffff","AccentColor":"00aa00","BackgroundColor":"000000","OutlineColor":"660000"}]]
             ),
         },
         ["Dust Bowl"] = {
