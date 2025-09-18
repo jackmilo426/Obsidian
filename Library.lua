@@ -146,7 +146,6 @@ do
         end
 
         local AssetID = `rbxassetid://{AssetData.RobloxId}`
-		
         AssetData.Id = AssetID
         return AssetID
     end
