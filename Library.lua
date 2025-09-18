@@ -1960,35 +1960,37 @@ do
             Picker.Size = UDim2.fromOffset(X + 9 * Library.DPIScale, Y + 4 * Library.DPIScale)
         end
 
-        function KeyPicker:Update()
-            KeyPicker:Display()
+		    function KeyPicker:Update()
+				if not Picker then
+					return
+				end
+			
+				local String = self.Value
+			
+				local ModeStr = ""
+				if self.Mode == "Toggle" then
+					ModeStr = " [T]"
+				elseif self.Mode == "Hold" then
+					ModeStr = " [H]"
+				elseif self.Mode == "Always" then
+					ModeStr = " [A]"
+				end
+			
+				if ModeStr ~= "" then
+					String ..= ModeStr
+					KeybindsToggle.Label.Text = self.Text .. ModeStr
+				end
+			
+				Picker.Text = String
 
-            if Info.NoUI then
-                return
-            end
-
-            if KeyPicker.Mode == "Toggle" and ParentObj.Type == "Toggle" and ParentObj.Disabled then
-                KeybindsToggle:SetVisibility(false)
-                return
-            end
-
-            local State = KeyPicker:GetState()
-            local ShowToggle = Library.ShowToggleFrameInKeybinds and KeyPicker.Mode == "Toggle"
-
-            if KeybindsToggle.Loaded then
-                if ShowToggle then
-                    KeybindsToggle:SetNormal(false)
-                else
-                    KeybindsToggle:SetNormal(true)
-                end
-
-                KeybindsToggle:SetText(("[%s] %s (%s)"):format(KeyPicker.Value, KeyPicker.Text, KeyPicker.Mode))
-                KeybindsToggle:SetVisibility(true)
-                KeybindsToggle:Display(State)
-            end
-
-            Library:UpdateKeybindFrame()
-        end
+				if self.Mode ~= "Press" then
+					KeybindsToggle.Holder.Visible = self.Value ~= "None"
+					Library:UpdateKeybindFrame()
+				end
+			
+				Library:SafeCallback(self.ChangedCallback, self.Value)
+				Library:SafeCallback(self.Changed, self.Value)
+			end
 
         function KeyPicker:GetState()
             if KeyPicker.Mode == "Always" then
@@ -2049,10 +2051,23 @@ do
             KeyPicker:Update()
         end
 
-        function KeyPicker:SetText(Text)
-            KeybindsToggle:SetText(Text)
-            KeyPicker:Update()
-        end
+		function KeyPicker:SetText(Text)
+		    self.Text = Text
+		    Picker.Name = Text
+		
+		    local ModeStr = ""
+		    if self.Mode == "Toggle" then
+		        ModeStr = " [T]"
+		    elseif self.Mode == "Hold" then
+		        ModeStr = " [H]"
+		    elseif self.Mode == "Always" then
+		        ModeStr = " [A]"
+		    end
+		
+		    if ModeStr ~= "" then
+		        KeybindsToggle.Label.Text = Text .. ModeStr
+		    end
+		end
 
         local Picking = false
         Picker.MouseButton1Click:Connect(function()
