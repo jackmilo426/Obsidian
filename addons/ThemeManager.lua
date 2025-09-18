@@ -398,13 +398,13 @@ do
         ["Sunrise Glow"] = {
             60,
             httpService:JSONDecode(
-                [[{"FontColor":"1a1a1a","MainColor":"ffa726","AccentColor":"ffeb99","BackgroundColor":"301508","OutlineColor":"8c5200"}]]
+                [[{"FontColor":"ffffff","MainColor":"ad6700","AccentColor":"ffeb99","BackgroundColor":"3d281e","OutlineColor":"8c5200"}]]
             ),
         },
         ["Marshmallow"] = {
             61,
             httpService:JSONDecode(
-                [[{"FontColor":"ffffff","MainColor":"ad6700","AccentColor":"ffeb99","BackgroundColor":"3d281e","OutlineColor":"8c5200"}]]
+                [[{"FontColor":"1a1a1a","MainColor":"fce4ec","AccentColor":"f8bbd0","BackgroundColor":"3a2525","OutlineColor":"7a5555"}]]
             ),
         },
         ["Jade Forest"] = {
