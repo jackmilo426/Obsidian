@@ -5510,7 +5510,7 @@ function Library:CreateWindow(WindowInfo)
         local PlayerInfoFrame = New("Frame", {
             BackgroundTransparency = 0,
             BackgroundColor3 = "BackgroundColor",
-            Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
+            Size = UDim2.new(0.3, 0, 0, 40), -- Altura más pequeña (40px)
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
             Position = UDim2.new(0, 0, 1, -21), -- Mantener posición ajustada
             ZIndex = 2, -- Superponer sobre las pestañas
@@ -5521,12 +5521,12 @@ function Library:CreateWindow(WindowInfo)
             Parent = PlayerInfoFrame,
         })
 
-        -- Botón transparente para bloquear clics en el fondo
+        -- Botón transparente para bloquear clics y alternar modos
         local BlockerButton = New("TextButton", {
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 1, 0), -- Cubre todo el PlayerInfoFrame
             Text = "",
-            ZIndex = 2, -- Debajo de los elementos interactivos (AvatarButton, labels)
+            ZIndex = 2, -- Debajo de los elementos interactivos
             Parent = PlayerInfoFrame,
         })
 
@@ -5541,16 +5541,16 @@ function Library:CreateWindow(WindowInfo)
 
         local AvatarButton = New("TextButton", {
             BackgroundTransparency = 1,
-            Size = UDim2.fromOffset(40, 40),
-            Position = UDim2.fromOffset(12, 5), -- Alineado con el PaddingLeft de los TabButton
+            Size = UDim2.fromOffset(32, 32), -- Avatar más pequeño
+            Position = UDim2.fromOffset(12, 4), -- Ajustado para nueva altura
             Text = "",
-            ZIndex = 3, -- Sobre el BlockerButton
+            ZIndex = 3,
             Parent = PlayerInfoFrame,
         })
 
         local AvatarImage = New("ImageLabel", {
             BackgroundTransparency = 1,
-            Size = UDim2.fromOffset(40, 40),
+            Size = UDim2.fromOffset(32, 32), -- Avatar más pequeño
             Position = UDim2.fromOffset(0, 0),
             Image = avatarUrl,
             ImageColor3 = Color3.fromRGB(255, 255, 255), -- Color inicial
@@ -5565,37 +5565,37 @@ function Library:CreateWindow(WindowInfo)
 
         local DisplayNameLabel = New("TextLabel", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(0, 100, 0, 18),
-            Position = UDim2.fromOffset(60, 5), -- Ajustado para alinearse con el avatar
+            Size = UDim2.new(0, 80, 0, 16), -- Más pequeño
+            Position = UDim2.fromOffset(50, 4), -- Ajustado para nueva altura
             Text = game.Players.LocalPlayer.DisplayName,
-            TextSize = 13, -- Ligeramente más pequeño
-            TextColor3 = Library.Scheme.FontColor, -- Usar el color de fuente de la biblioteca
+            TextSize = 12, -- Más pequeño
+            TextColor3 = Library.Scheme.FontColor,
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 3, -- Sobre el BlockerButton
+            ZIndex = 3,
             Parent = PlayerInfoFrame,
         })
 
         local UsernameLabel = New("TextLabel", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(0, 100, 0, 14),
-            Position = UDim2.fromOffset(60, 23), -- Ajustado para estar debajo de DisplayName
+            Size = UDim2.new(0, 80, 0, 12), -- Más pequeño
+            Position = UDim2.fromOffset(50, 20), -- Ajustado para nueva altura
             Text = "@" .. game.Players.LocalPlayer.Name,
-            TextSize = 11, -- Más pequeño para ser "pequeñito"
-            TextColor3 = Color3.fromRGB(200, 200, 200), -- Ligeramente más claro
+            TextSize = 10, -- Más pequeño
+            TextColor3 = Color3.fromRGB(200, 200, 200),
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 3, -- Sobre el BlockerButton
+            ZIndex = 3,
             Parent = PlayerInfoFrame,
         })
 
         local AXUserLabel = New("TextLabel", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(0, 100, 0, 14),
-            Position = UDim2.fromOffset(60, 16), -- Centrado verticalmente (50px altura ÷ 2 ≈ 25, ajustado a 16)
+            Size = UDim2.new(0, 80, 0, 12), -- Más pequeño
+            Position = UDim2.fromOffset(50, 14), -- Centrado verticalmente (40px ÷ 2 ≈ 20, ajustado a 14)
             Text = "AX-User",
-            TextSize = 11,
+            TextSize = 10,
             TextColor3 = Color3.fromRGB(200, 200, 200),
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 3, -- Sobre el BlockerButton
+            ZIndex = 3,
             Visible = false, -- Oculto por defecto
             Parent = PlayerInfoFrame,
         })
@@ -5603,8 +5603,8 @@ function Library:CreateWindow(WindowInfo)
         -- Estado para rastrear si la info está oculta
         local isInfoHidden = false
 
-        -- Evento para ocultar/mostrar al clickear el avatar
-        AvatarButton.MouseButton1Click:Connect(function()
+        -- Evento para ocultar/mostrar al clickear cualquier parte del cuadro
+        BlockerButton.MouseButton1Click:Connect(function()
             isInfoHidden = not isInfoHidden
             if isInfoHidden then
                 -- Modo oculto: círculo gris sólido, mostrar solo AX-User, ocultar DisplayName y Username
@@ -5626,17 +5626,17 @@ function Library:CreateWindow(WindowInfo)
                 AXUserLabel.Visible = false
             end
             -- Ajustar CanvasSize
-            local marginBottom = 50 -- Siempre reservar espacio
+            local marginBottom = 40 -- Ajustado para nueva altura
             Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
         end)
 
         -- Ajustar CanvasSize dinámicamente
         Tabs.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            local marginBottom = 50 -- Siempre reservar espacio
+            local marginBottom = 40 -- Ajustado para nueva altura
             Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
         end)
         -- Inicializar CanvasSize
-        local marginBottom = 50
+        local marginBottom = 40
         Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
 
         --// Container \\--
