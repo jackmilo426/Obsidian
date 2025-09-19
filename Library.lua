@@ -5512,7 +5512,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "BackgroundColor",
             Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, -22), -- Mover 3 píxeles más abajo
+            Position = UDim2.new(0, 0, 1, -24), -- Mover 3 píxeles más abajo
             ZIndex = 2, -- Superponer sobre las pestañas
             Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
         })
@@ -5587,7 +5587,7 @@ function Library:CreateWindow(WindowInfo)
             if isInfoHidden then
                 -- Modo oculto: círculo gris sólido, solo "AX-User"
                 AvatarImage.Image = "" -- Sin imagen
-                AvatarImage.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+                AvatarImage.BackgroundColor3 = Color3.fromRGB(162, 162, 162)
                 AvatarImage.BackgroundTransparency = 0
                 AvatarImage.ImageTransparency = 1
                 DisplayNameLabel.Text = "AX-User"
