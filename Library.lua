@@ -5506,23 +5506,34 @@ function Library:CreateWindow(WindowInfo)
             Parent = Tabs,
         })
 
+        -- Ajustar CanvasSize solo para las pestañas
+        Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y)
+
         --// Player Info Frame (Avatar, DisplayName, Username) \\--
         local PlayerInfoFrame = New("Frame", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 60),
-            LayoutOrder = 999, -- Para que aparezca al final
-            Parent = Tabs,
+            Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
+            AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
+            Position = UDim2.new(0, 0, 1, -20), -- Alinear con la parte inferior de MainFrame (compensando BottomBar)
+            ZIndex = 2, -- Superponer sobre las pestañas
+            Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
         })
+
+        local avatarUrl = "rbxassetid://0" -- Fallback por si falla la carga
+        pcall(function()
+            avatarUrl = game.Players:GetUserThumbnailAsync(
+                game.Players.LocalPlayer.UserId,
+                Enum.ThumbnailType.AvatarBust,
+                Enum.ThumbnailSize.Size48x48
+            )
+        end)
 
         local AvatarImage = New("ImageLabel", {
             BackgroundTransparency = 1,
             Size = UDim2.fromOffset(40, 40),
-            Position = UDim2.fromOffset(5, 10),
-            Image = game.Players:GetUserThumbnailAsync(
-                game.Players.LocalPlayer.UserId,
-                Enum.ThumbnailType.AvatarBust,
-                Enum.ThumbnailSize.Size48x48
-            ),
+            Position = UDim2.fromOffset(12, 5), -- Alineado con el PaddingLeft de los TabButton
+            Image = avatarUrl,
+            ZIndex = 2, -- Asegurar superposición
             Parent = PlayerInfoFrame,
         })
         New("UICorner", {
@@ -5532,23 +5543,25 @@ function Library:CreateWindow(WindowInfo)
 
         local DisplayNameLabel = New("TextLabel", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(0, 100, 0, 20),
-            Position = UDim2.fromOffset(50, 10),
+            Size = UDim2.new(0, 100, 0, 18),
+            Position = UDim2.fromOffset(60, 5), -- Ajustado para alinearse con el avatar
             Text = game.Players.LocalPlayer.DisplayName,
-            TextSize = 14,
+            TextSize = 13, -- Ligeramente más pequeño
             TextColor3 = Library.Scheme.FontColor, -- Usar el color de fuente de la biblioteca
             TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 2, -- Asegurar superposición
             Parent = PlayerInfoFrame,
         })
 
         local UsernameLabel = New("TextLabel", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(0, 100, 0, 16),
-            Position = UDim2.fromOffset(50, 30),
+            Size = UDim2.new(0, 100, 0, 14),
+            Position = UDim2.fromOffset(60, 23), -- Ajustado para estar debajo de DisplayName
             Text = "@" .. game.Players.LocalPlayer.Name,
-            TextSize = 12,
+            TextSize = 11, -- Más pequeño para ser "pequeñito"
             TextColor3 = Color3.fromRGB(200, 200, 200), -- Ligeramente más claro
             TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 2, -- Asegurar superposición
             Parent = PlayerInfoFrame,
         })
 
