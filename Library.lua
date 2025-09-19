@@ -5521,7 +5521,7 @@ function Library:CreateWindow(WindowInfo)
             Image = game.Players:GetUserThumbnailAsync(
                 game.Players.LocalPlayer.UserId,
                 Enum.ThumbnailType.AvatarBust,
-                Enum.ThumbnailSize.Size100
+                Enum.ThumbnailSize.Size48x48
             ),
             Parent = PlayerInfoFrame,
         })
