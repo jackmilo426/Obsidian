@@ -5512,7 +5512,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "BackgroundColor",
             Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, -20), -- 3 píxeles más abajo
+            Position = UDim2.new(0, 0, 1, -21), -- 3 píxeles más abajo
             ZIndex = 2, -- Superponer sobre las pestañas
             Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
         })
