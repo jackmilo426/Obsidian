@@ -5512,7 +5512,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "BackgroundColor",
             Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, -25), -- Mover 5 píxeles más arriba para no tapar contorno
+            Position = UDim2.new(0, 0, 1, -22), -- Mover 3 píxeles más abajo
             ZIndex = 2, -- Superponer sobre las pestañas
             Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
         })
@@ -5585,22 +5585,24 @@ function Library:CreateWindow(WindowInfo)
         AvatarButton.MouseButton1Click:Connect(function()
             isInfoHidden = not isInfoHidden
             if isInfoHidden then
-                -- Modo oculto: círculo gris, solo "AX-User"
-                AvatarImage.ImageColor3 = Color3.fromRGB(100, 100, 100)
-                AvatarImage.ImageTransparency = 0
-                AvatarImage.Image = "rbxassetid://0" -- Círculo gris (sin imagen)
+                -- Modo oculto: círculo gris sólido, solo "AX-User"
+                AvatarImage.Image = "" -- Sin imagen
+                AvatarImage.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+                AvatarImage.BackgroundTransparency = 0
+                AvatarImage.ImageTransparency = 1
                 DisplayNameLabel.Text = "AX-User"
                 UsernameLabel.Visible = false
             else
                 -- Modo mostrado: restaurar avatar y textos
+                AvatarImage.Image = avatarUrl
+                AvatarImage.BackgroundTransparency = 1
                 AvatarImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
                 AvatarImage.ImageTransparency = 0
-                AvatarImage.Image = avatarUrl
                 DisplayNameLabel.Text = game.Players.LocalPlayer.DisplayName
                 UsernameLabel.Visible = true
             end
             -- Ajustar CanvasSize
-            local marginBottom = 50 -- Siempre reservar espacio, ya que PlayerInfoFrame permanece visible
+            local marginBottom = 50 -- Siempre reservar espacio
             Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
         end)
 
