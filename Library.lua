@@ -5506,6 +5506,55 @@ function Library:CreateWindow(WindowInfo)
             Parent = Tabs,
         })
 
+        --// Player Info Frame (Avatar, DisplayName, Username) \\--
+        local PlayerInfoFrame = New("Frame", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 60),
+            LayoutOrder = 999, -- Para que aparezca al final
+            Parent = Tabs,
+        })
+
+        local AvatarImage = New("ImageLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.fromOffset(40, 40),
+            Position = UDim2.fromOffset(5, 10),
+            Image = game.Players:GetUserThumbnailAsync(
+                game.Players.LocalPlayer.UserId,
+                Enum.ThumbnailType.AvatarBust,
+                Enum.ThumbnailSize.Size100
+            ),
+            Parent = PlayerInfoFrame,
+        })
+        New("UICorner", {
+            CornerRadius = UDim.new(1, 0), -- Círculo para el avatar
+            Parent = AvatarImage,
+        })
+
+        local DisplayNameLabel = New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(0, 100, 0, 20),
+            Position = UDim2.fromOffset(50, 10),
+            Text = game.Players.LocalPlayer.DisplayName,
+            TextSize = 14,
+            TextColor3 = Library.Scheme.FontColor, -- Usar el color de fuente de la biblioteca
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = PlayerInfoFrame,
+        })
+
+        local UsernameLabel = New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(0, 100, 0, 16),
+            Position = UDim2.fromOffset(50, 30),
+            Text = "@" .. game.Players.LocalPlayer.Name,
+            TextSize = 12,
+            TextColor3 = Color3.fromRGB(200, 200, 200), -- Ligeramente más claro
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = PlayerInfoFrame,
+        })
+
+        -- Ajustar CanvasSize para incluir PlayerInfoFrame
+        Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + 60)
+
         --// Container \\--
         Container = New("Frame", {
             AnchorPoint = Vector2.new(1, 0),
