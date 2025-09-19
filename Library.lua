@@ -5512,7 +5512,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "BackgroundColor",
             Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, -30), -- 3 píxeles más abajo
+            Position = UDim2.new(0, 0, 1, -20), -- 3 píxeles más abajo
             ZIndex = 2, -- Superponer sobre las pestañas
             Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
         })
@@ -5578,6 +5578,19 @@ function Library:CreateWindow(WindowInfo)
             Parent = PlayerInfoFrame,
         })
 
+        local AXUserLabel = New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(0, 100, 0, 14),
+            Position = UDim2.fromOffset(60, 16), -- Centrado verticalmente (50px altura ÷ 2 ≈ 25, ajustado a 16)
+            Text = "AX-User",
+            TextSize = 11,
+            TextColor3 = Color3.fromRGB(200, 200, 200),
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 3,
+            Visible = false, -- Oculto por defecto
+            Parent = PlayerInfoFrame,
+        })
+
         -- Estado para rastrear si la info está oculta
         local isInfoHidden = false
 
@@ -5585,13 +5598,14 @@ function Library:CreateWindow(WindowInfo)
         AvatarButton.MouseButton1Click:Connect(function()
             isInfoHidden = not isInfoHidden
             if isInfoHidden then
-                -- Modo oculto: círculo gris sólido, "AX-User" en posición de Username, ocultar DisplayName
+                -- Modo oculto: círculo gris sólido, mostrar solo AX-User, ocultar DisplayName y Username
                 AvatarImage.Image = "" -- Sin imagen
-                AvatarImage.BackgroundColor3 = Color3.fromRGB(153, 153, 153)
+                AvatarImage.BackgroundColor3 = Color3.fromRGB(181, 181, 181)
                 AvatarImage.BackgroundTransparency = 0
                 AvatarImage.ImageTransparency = 1
                 DisplayNameLabel.Visible = false
-                UsernameLabel.Text = "AX-User"
+                UsernameLabel.Visible = false
+                AXUserLabel.Visible = true
             else
                 -- Modo mostrado: restaurar avatar y textos
                 AvatarImage.Image = avatarUrl
@@ -5599,7 +5613,8 @@ function Library:CreateWindow(WindowInfo)
                 AvatarImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
                 AvatarImage.ImageTransparency = 0
                 DisplayNameLabel.Visible = true
-                UsernameLabel.Text = "@" .. game.Players.LocalPlayer.Name
+                UsernameLabel.Visible = true
+                AXUserLabel.Visible = false
             end
             -- Ajustar CanvasSize
             local marginBottom = 50 -- Siempre reservar espacio
