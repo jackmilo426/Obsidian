@@ -5506,6 +5506,97 @@ function Library:CreateWindow(WindowInfo)
             Parent = Tabs,
         })
 
+        --// Player Info Frame (Avatar, DisplayName, Username) \\--
+        local PlayerInfoFrame = New("Frame", {
+            BackgroundTransparency = 0,
+            BackgroundColor3 = "BackgroundColor",
+            Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
+            AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
+            Position = UDim2.new(0, 0, 1, -20), -- Alinear con la parte inferior de MainFrame (compensando BottomBar)
+            ZIndex = 2, -- Superponer sobre las pestañas
+            Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
+        })
+        New("UICorner", {
+            CornerRadius = UDim.new(0, Library.CornerRadius - 1),
+            Parent = PlayerInfoFrame,
+        })
+
+        local avatarUrl = "rbxassetid://0" -- Fallback por si falla la carga
+        pcall(function()
+            avatarUrl = game.Players:GetUserThumbnailAsync(
+                game.Players.LocalPlayer.UserId,
+                Enum.ThumbnailType.AvatarBust,
+                Enum.ThumbnailSize.Size48x48
+            )
+        end)
+
+        local AvatarButton = New("TextButton", {
+            BackgroundTransparency = 1,
+            Size = UDim2.fromOffset(40, 40),
+            Position = UDim2.fromOffset(12, 5), -- Alineado con el PaddingLeft de los TabButton
+            Text = "",
+            ZIndex = 3,
+            Parent = PlayerInfoFrame,
+        })
+
+        local AvatarImage = New("ImageLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.fromOffset(40, 40),
+            Position = UDim2.fromOffset(0, 0),
+            Image = avatarUrl,
+            ZIndex = 3,
+            Parent = AvatarButton,
+        })
+        New("UICorner", {
+            CornerRadius = UDim.new(1, 0), -- Círculo para el avatar
+            Parent = AvatarImage,
+        })
+
+        local DisplayNameLabel = New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(0, 100, 0, 18),
+            Position = UDim2.fromOffset(60, 5), -- Ajustado para alinearse con el avatar
+            Text = game.Players.LocalPlayer.DisplayName,
+            TextSize = 13, -- Ligeramente más pequeño
+            TextColor3 = Library.Scheme.FontColor, -- Usar el color de fuente de la biblioteca
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 3,
+            Parent = PlayerInfoFrame,
+        })
+
+        local UsernameLabel = New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(0, 100, 0, 14),
+            Position = UDim2.fromOffset(60, 23), -- Ajustado para estar debajo de DisplayName
+            Text = "@" .. game.Players.LocalPlayer.Name,
+            TextSize = 11, -- Más pequeño para ser "pequeñito"
+            TextColor3 = Color3.fromRGB(200, 200, 200), -- Ligeramente más claro
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 3,
+            Parent = PlayerInfoFrame,
+        })
+
+        -- Evento para ocultar/mostrar al clickear el avatar
+        AvatarButton.MouseButton1Click:Connect(function()
+            PlayerInfoFrame.Visible = not PlayerInfoFrame.Visible
+            -- Ajustar CanvasSize cuando se oculta/muestra
+            local marginBottom = PlayerInfoFrame.Visible and 50 or 0
+            Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
+        end)
+
+        -- Ajustar CanvasSize para incluir margen inferior para PlayerInfoFrame
+        Tabs.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            local marginBottom = PlayerInfoFrame.Visible and 50 or 0
+            Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
+        end)
+        -- Inicializar CanvasSize
+        local marginBottom = PlayerInfoFrame.Visible and 50 or 0
+        Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
+
+        New("UIListLayout", {
+            Parent = Tabs,
+        })
+
         --// Container \\--
         Container = New("Frame", {
             AnchorPoint = Vector2.new(1, 0),
