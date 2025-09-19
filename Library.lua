@@ -5512,7 +5512,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "BackgroundColor",
             Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, -24), -- Mover 3 píxeles más abajo
+            Position = UDim2.new(0, 0, 1, -30), -- 3 píxeles más abajo
             ZIndex = 2, -- Superponer sobre las pestañas
             Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
         })
@@ -5585,21 +5585,21 @@ function Library:CreateWindow(WindowInfo)
         AvatarButton.MouseButton1Click:Connect(function()
             isInfoHidden = not isInfoHidden
             if isInfoHidden then
-                -- Modo oculto: círculo gris sólido, solo "AX-User"
+                -- Modo oculto: círculo gris sólido, "AX-User" en posición de Username, ocultar DisplayName
                 AvatarImage.Image = "" -- Sin imagen
-                AvatarImage.BackgroundColor3 = Color3.fromRGB(162, 162, 162)
+                AvatarImage.BackgroundColor3 = Color3.fromRGB(153, 153, 153)
                 AvatarImage.BackgroundTransparency = 0
                 AvatarImage.ImageTransparency = 1
-                DisplayNameLabel.Text = "AX-User"
-                UsernameLabel.Visible = false
+                DisplayNameLabel.Visible = false
+                UsernameLabel.Text = "AX-User"
             else
                 -- Modo mostrado: restaurar avatar y textos
                 AvatarImage.Image = avatarUrl
                 AvatarImage.BackgroundTransparency = 1
                 AvatarImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
                 AvatarImage.ImageTransparency = 0
-                DisplayNameLabel.Text = game.Players.LocalPlayer.DisplayName
-                UsernameLabel.Visible = true
+                DisplayNameLabel.Visible = true
+                UsernameLabel.Text = "@" .. game.Players.LocalPlayer.Name
             end
             -- Ajustar CanvasSize
             local marginBottom = 50 -- Siempre reservar espacio
