@@ -1756,7 +1756,7 @@ local BaseAddons = {}
 do
     local Funcs = {}
 
-	function Funcs:AddKeyPicker(Idx, Info)
+    function Funcs:AddKeyPicker(Idx, Info)
     Info = Library:Validate(Info, Templates.KeyPicker)
 
     local ParentObj = self
@@ -1987,7 +1987,7 @@ do
                 KeybindsToggle:SetVisibility(false)
             else
                 KeybindsToggle:SetVisibility(true)
-                local modeStr = string.format(" (%s)", KeyPicker.Mode:sub(1, 1):upper())
+                local modeStr = string.format(" (%s)", KeyPicker.Mode:sub(1, 1):upper()) -- Primera letra del modo en mayúscula
                 local text = KeybindsToggle.Normal and
                     string.format("[%s] - %s%s", KeyPicker.Value, KeyPicker.Text, modeStr) or
                     string.format("[%s] %s%s", KeyPicker.Value, KeyPicker.Text, modeStr)
@@ -5505,81 +5505,6 @@ function Library:CreateWindow(WindowInfo)
         New("UIListLayout", {
             Parent = Tabs,
         })
-
-        --// Player Info Frame (Avatar, DisplayName, Username) \\--
-        local PlayerInfoFrame = New("Frame", {
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 50), -- Altura compacta
-            LayoutOrder = 999, -- Al final de las pestañas
-            Parent = Tabs,
-        })
-
-        local avatarUrl = "rbxassetid://0" -- Fallback por si falla la carga
-        pcall(function()
-            avatarUrl = game.Players:GetUserThumbnailAsync(
-                game.Players.LocalPlayer.UserId,
-                Enum.ThumbnailType.AvatarBust,
-                Enum.ThumbnailSize.Size48x48
-            )
-        end)
-
-        local AvatarButton = New("TextButton", {
-            BackgroundTransparency = 1,
-            Size = UDim2.fromOffset(40, 40),
-            Position = UDim2.fromOffset(12, 5), -- Alineado con el PaddingLeft de los TabButton
-            Text = "",
-            Parent = PlayerInfoFrame,
-        })
-
-        local AvatarImage = New("ImageLabel", {
-            BackgroundTransparency = 1,
-            Size = UDim2.fromOffset(40, 40),
-            Position = UDim2.fromOffset(0, 0),
-            Image = avatarUrl,
-            Parent = AvatarButton,
-        })
-        New("UICorner", {
-            CornerRadius = UDim.new(1, 0), -- Círculo para el avatar
-            Parent = AvatarImage,
-        })
-
-        local DisplayNameLabel = New("TextLabel", {
-            BackgroundTransparency = 1,
-            Size = UDim2.new(0, 100, 0, 18),
-            Position = UDim2.fromOffset(60, 5), -- Ajustado para alinearse con el avatar
-            Text = game.Players.LocalPlayer.DisplayName,
-            TextSize = 13, -- Ligeramente más pequeño
-            TextColor3 = Library.Scheme.FontColor, -- Usar el color de fuente de la biblioteca
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Parent = PlayerInfoFrame,
-        })
-
-        local UsernameLabel = New("TextLabel", {
-            BackgroundTransparency = 1,
-            Size = UDim2.new(0, 100, 0, 14),
-            Position = UDim2.fromOffset(60, 23), -- Ajustado para estar debajo de DisplayName
-            Text = "@" .. game.Players.LocalPlayer.Name,
-            TextSize = 11, -- Más pequeño para ser "pequeñito"
-            TextColor3 = Color3.fromRGB(200, 200, 200), -- Ligeramente más claro
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Parent = PlayerInfoFrame,
-        })
-
-        -- Evento para ocultar/mostrar al clickear el avatar
-        AvatarButton.MouseButton1Click:Connect(function()
-            PlayerInfoFrame.Visible = not PlayerInfoFrame.Visible
-        })
-
-        -- Ajustar CanvasSize para incluir PlayerInfoFrame
-        Tabs:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-            local minCanvasHeight = Tabs.UIListLayout.AbsoluteContentSize.Y + (PlayerInfoFrame.Visible and 50 or 0)
-            local tabsHeight = Tabs.AbsoluteSize.Y
-            Tabs.CanvasSize = UDim2.new(0, 0, 0, math.max(minCanvasHeight, tabsHeight))
-        end)
-        -- Inicializar CanvasSize
-        local minCanvasHeight = Tabs.UIListLayout.AbsoluteContentSize.Y + (PlayerInfoFrame.Visible and 50 or 0)
-        local tabsHeight = Tabs.AbsoluteSize.Y
-        Tabs.CanvasSize = UDim2.new(0, 0, 0, math.max(minCanvasHeight, tabsHeight))
 
         --// Container \\--
         Container = New("Frame", {
