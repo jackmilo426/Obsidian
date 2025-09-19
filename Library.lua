@@ -5509,8 +5509,8 @@ function Library:CreateWindow(WindowInfo)
         --// Player Info Frame (Avatar, DisplayName, Username) \\--
         local PlayerInfoFrame = New("Frame", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 50),
-            LayoutOrder = 999, -- Para que aparezca al final
+            Size = UDim2.new(1, 0, 0, 50), -- Altura compacta
+            LayoutOrder = 999, -- Al final de las pestañas
             Parent = Tabs,
         })
 
@@ -5523,12 +5523,20 @@ function Library:CreateWindow(WindowInfo)
             )
         end)
 
-        local AvatarImage = New("ImageLabel", {
+        local AvatarButton = New("TextButton", {
             BackgroundTransparency = 1,
             Size = UDim2.fromOffset(40, 40),
             Position = UDim2.fromOffset(12, 5), -- Alineado con el PaddingLeft de los TabButton
-            Image = avatarUrl,
+            Text = "",
             Parent = PlayerInfoFrame,
+        })
+
+        local AvatarImage = New("ImageLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.fromOffset(40, 40),
+            Position = UDim2.fromOffset(0, 0),
+            Image = avatarUrl,
+            Parent = AvatarButton,
         })
         New("UICorner", {
             CornerRadius = UDim.new(1, 0), -- Círculo para el avatar
@@ -5557,10 +5565,21 @@ function Library:CreateWindow(WindowInfo)
             Parent = PlayerInfoFrame,
         })
 
-        -- Evento para ocultar al clickear el avatar
-        AvatarImage.MouseButton1Click:Connect(function()
+        -- Evento para ocultar/mostrar al clickear el avatar
+        AvatarButton.MouseButton1Click:Connect(function()
             PlayerInfoFrame.Visible = not PlayerInfoFrame.Visible
+        })
+
+        -- Ajustar CanvasSize para incluir PlayerInfoFrame
+        Tabs:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            local minCanvasHeight = Tabs.UIListLayout.AbsoluteContentSize.Y + (PlayerInfoFrame.Visible and 50 or 0)
+            local tabsHeight = Tabs.AbsoluteSize.Y
+            Tabs.CanvasSize = UDim2.new(0, 0, 0, math.max(minCanvasHeight, tabsHeight))
         end)
+        -- Inicializar CanvasSize
+        local minCanvasHeight = Tabs.UIListLayout.AbsoluteContentSize.Y + (PlayerInfoFrame.Visible and 50 or 0)
+        local tabsHeight = Tabs.AbsoluteSize.Y
+        Tabs.CanvasSize = UDim2.new(0, 0, 0, math.max(minCanvasHeight, tabsHeight))
 
         --// Container \\--
         Container = New("Frame", {
