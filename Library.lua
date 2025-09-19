@@ -5512,12 +5512,21 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "BackgroundColor",
             Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, -21), -- 3 píxeles más abajo
+            Position = UDim2.new(0, 0, 1, -21), -- Mantener posición ajustada
             ZIndex = 2, -- Superponer sobre las pestañas
             Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
         })
         New("UICorner", {
             CornerRadius = UDim.new(0, Library.CornerRadius - 1),
+            Parent = PlayerInfoFrame,
+        })
+
+        -- Botón transparente para bloquear clics en el fondo
+        local BlockerButton = New("TextButton", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0), -- Cubre todo el PlayerInfoFrame
+            Text = "",
+            ZIndex = 2, -- Debajo de los elementos interactivos (AvatarButton, labels)
             Parent = PlayerInfoFrame,
         })
 
@@ -5535,7 +5544,7 @@ function Library:CreateWindow(WindowInfo)
             Size = UDim2.fromOffset(40, 40),
             Position = UDim2.fromOffset(12, 5), -- Alineado con el PaddingLeft de los TabButton
             Text = "",
-            ZIndex = 3,
+            ZIndex = 3, -- Sobre el BlockerButton
             Parent = PlayerInfoFrame,
         })
 
@@ -5562,7 +5571,7 @@ function Library:CreateWindow(WindowInfo)
             TextSize = 13, -- Ligeramente más pequeño
             TextColor3 = Library.Scheme.FontColor, -- Usar el color de fuente de la biblioteca
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 3,
+            ZIndex = 3, -- Sobre el BlockerButton
             Parent = PlayerInfoFrame,
         })
 
@@ -5574,7 +5583,7 @@ function Library:CreateWindow(WindowInfo)
             TextSize = 11, -- Más pequeño para ser "pequeñito"
             TextColor3 = Color3.fromRGB(200, 200, 200), -- Ligeramente más claro
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 3,
+            ZIndex = 3, -- Sobre el BlockerButton
             Parent = PlayerInfoFrame,
         })
 
@@ -5586,7 +5595,7 @@ function Library:CreateWindow(WindowInfo)
             TextSize = 11,
             TextColor3 = Color3.fromRGB(200, 200, 200),
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 3,
+            ZIndex = 3, -- Sobre el BlockerButton
             Visible = false, -- Oculto por defecto
             Parent = PlayerInfoFrame,
         })
