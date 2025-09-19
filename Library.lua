@@ -5512,11 +5512,10 @@ function Library:CreateWindow(WindowInfo)
         --// Player Info Frame (Avatar, DisplayName, Username) \\--
         local PlayerInfoFrame = New("Frame", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
+            Size = UDim2.new(1, 0, 0, 50),
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, -20), -- Alinear con la parte inferior de MainFrame (compensando BottomBar)
-            ZIndex = 2, -- Superponer sobre las pestañas
-            Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
+            Position = UDim2.new(0, 0, 1, 0), -- Fijar en la parte inferior del ScrollingFrame
+            Parent = Tabs,
         })
 
         local avatarUrl = "rbxassetid://0" -- Fallback por si falla la carga
@@ -5533,7 +5532,6 @@ function Library:CreateWindow(WindowInfo)
             Size = UDim2.fromOffset(40, 40),
             Position = UDim2.fromOffset(12, 5), -- Alineado con el PaddingLeft de los TabButton
             Image = avatarUrl,
-            ZIndex = 2, -- Asegurar superposición
             Parent = PlayerInfoFrame,
         })
         New("UICorner", {
@@ -5549,7 +5547,6 @@ function Library:CreateWindow(WindowInfo)
             TextSize = 13, -- Ligeramente más pequeño
             TextColor3 = Library.Scheme.FontColor, -- Usar el color de fuente de la biblioteca
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 2, -- Asegurar superposición
             Parent = PlayerInfoFrame,
         })
 
@@ -5561,12 +5558,13 @@ function Library:CreateWindow(WindowInfo)
             TextSize = 11, -- Más pequeño para ser "pequeñito"
             TextColor3 = Color3.fromRGB(200, 200, 200), -- Ligeramente más claro
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 2, -- Asegurar superposición
             Parent = PlayerInfoFrame,
         })
 
-        -- Ajustar CanvasSize para incluir PlayerInfoFrame
-        Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + 60)
+        -- Ajustar CanvasSize para asegurar que PlayerInfoFrame sea visible
+        local minCanvasHeight = Tabs.UIListLayout.AbsoluteContentSize.Y + 50
+        local tabsHeight = Tabs.AbsoluteSize.Y
+        Tabs.CanvasSize = UDim2.new(0, 0, 0, math.max(minCanvasHeight, tabsHeight))
 
         --// Container \\--
         Container = New("Frame", {
