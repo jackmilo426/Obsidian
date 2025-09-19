@@ -5506,15 +5506,11 @@ function Library:CreateWindow(WindowInfo)
             Parent = Tabs,
         })
 
-        -- Ajustar CanvasSize solo para las pestañas
-        Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y)
-
         --// Player Info Frame (Avatar, DisplayName, Username) \\--
         local PlayerInfoFrame = New("Frame", {
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 50),
-            AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, 0), -- Fijar en la parte inferior del ScrollingFrame
+            LayoutOrder = 999, -- Para que aparezca al final
             Parent = Tabs,
         })
 
@@ -5561,10 +5557,10 @@ function Library:CreateWindow(WindowInfo)
             Parent = PlayerInfoFrame,
         })
 
-        -- Ajustar CanvasSize para asegurar que PlayerInfoFrame sea visible
-        local minCanvasHeight = Tabs.UIListLayout.AbsoluteContentSize.Y + 50
-        local tabsHeight = Tabs.AbsoluteSize.Y
-        Tabs.CanvasSize = UDim2.new(0, 0, 0, math.max(minCanvasHeight, tabsHeight))
+        -- Evento para ocultar al clickear el avatar
+        AvatarImage.MouseButton1Click:Connect(function()
+            PlayerInfoFrame.Visible = not PlayerInfoFrame.Visible
+        end)
 
         --// Container \\--
         Container = New("Frame", {
