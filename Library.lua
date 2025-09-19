@@ -5526,7 +5526,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 1, 0), -- Cubre todo el PlayerInfoFrame
             Text = "",
-            ZIndex = 2, -- Debajo de los elementos interactivos
+            ZIndex = 2, -- Debajo de los elementos visuales
             Parent = PlayerInfoFrame,
         })
 
@@ -5539,11 +5539,10 @@ function Library:CreateWindow(WindowInfo)
             )
         end)
 
-        local AvatarButton = New("TextButton", {
+        local AvatarFrame = New("Frame", {
             BackgroundTransparency = 1,
             Size = UDim2.fromOffset(32, 32), -- Avatar más pequeño
             Position = UDim2.fromOffset(12, 4), -- Ajustado para nueva altura
-            Text = "",
             ZIndex = 3,
             Parent = PlayerInfoFrame,
         })
@@ -5556,7 +5555,7 @@ function Library:CreateWindow(WindowInfo)
             ImageColor3 = Color3.fromRGB(255, 255, 255), -- Color inicial
             ImageTransparency = 0,
             ZIndex = 3,
-            Parent = AvatarButton,
+            Parent = AvatarFrame,
         })
         New("UICorner", {
             CornerRadius = UDim.new(1, 0), -- Círculo para el avatar
