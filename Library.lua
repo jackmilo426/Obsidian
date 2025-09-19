@@ -5512,7 +5512,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "BackgroundColor",
             Size = UDim2.new(0.3, 0, 0, 50), -- Coincide con el ancho de Tabs, altura compacta
             AnchorPoint = Vector2.new(0, 1), -- Anclar al fondo
-            Position = UDim2.new(0, 0, 1, -20), -- Alinear con la parte inferior de MainFrame (compensando BottomBar)
+            Position = UDim2.new(0, 0, 1, -25), -- Mover 5 píxeles más arriba para no tapar contorno
             ZIndex = 2, -- Superponer sobre las pestañas
             Parent = MainFrame, -- Hijo de MainFrame, no de Tabs
         })
@@ -5544,6 +5544,8 @@ function Library:CreateWindow(WindowInfo)
             Size = UDim2.fromOffset(40, 40),
             Position = UDim2.fromOffset(0, 0),
             Image = avatarUrl,
+            ImageColor3 = Color3.fromRGB(255, 255, 255), -- Color inicial
+            ImageTransparency = 0,
             ZIndex = 3,
             Parent = AvatarButton,
         })
@@ -5576,26 +5578,40 @@ function Library:CreateWindow(WindowInfo)
             Parent = PlayerInfoFrame,
         })
 
+        -- Estado para rastrear si la info está oculta
+        local isInfoHidden = false
+
         -- Evento para ocultar/mostrar al clickear el avatar
         AvatarButton.MouseButton1Click:Connect(function()
-            PlayerInfoFrame.Visible = not PlayerInfoFrame.Visible
-            -- Ajustar CanvasSize cuando se oculta/muestra
-            local marginBottom = PlayerInfoFrame.Visible and 50 or 0
+            isInfoHidden = not isInfoHidden
+            if isInfoHidden then
+                -- Modo oculto: círculo gris, solo "AX-User"
+                AvatarImage.ImageColor3 = Color3.fromRGB(100, 100, 100)
+                AvatarImage.ImageTransparency = 0
+                AvatarImage.Image = "rbxassetid://0" -- Círculo gris (sin imagen)
+                DisplayNameLabel.Text = "AX-User"
+                UsernameLabel.Visible = false
+            else
+                -- Modo mostrado: restaurar avatar y textos
+                AvatarImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
+                AvatarImage.ImageTransparency = 0
+                AvatarImage.Image = avatarUrl
+                DisplayNameLabel.Text = game.Players.LocalPlayer.DisplayName
+                UsernameLabel.Visible = true
+            end
+            -- Ajustar CanvasSize
+            local marginBottom = 50 -- Siempre reservar espacio, ya que PlayerInfoFrame permanece visible
             Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
         end)
 
-        -- Ajustar CanvasSize para incluir margen inferior para PlayerInfoFrame
+        -- Ajustar CanvasSize dinámicamente
         Tabs.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            local marginBottom = PlayerInfoFrame.Visible and 50 or 0
+            local marginBottom = 50 -- Siempre reservar espacio
             Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
         end)
         -- Inicializar CanvasSize
-        local marginBottom = PlayerInfoFrame.Visible and 50 or 0
+        local marginBottom = 50
         Tabs.CanvasSize = UDim2.new(0, 0, 0, Tabs.UIListLayout.AbsoluteContentSize.Y + marginBottom)
-
-        New("UIListLayout", {
-            Parent = Tabs,
-        })
 
         --// Container \\--
         Container = New("Frame", {
