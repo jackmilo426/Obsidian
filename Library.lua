@@ -112,7 +112,7 @@ local ObsidianImageManager = {
     }
 }
 do
-    local BaseURL = "https://raw.githubusercontent.com/jackmilo426/Obsidian/refs/heads/main/"
+    local BaseURL = "https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/"
 
     local function RecursiveCreatePath(Path: string, IsFile: boolean?)
         if not isfolder or not makefolder then return end
@@ -258,6 +258,7 @@ local Templates = {
         Font = Enum.Font.Code,
         ToggleKeybind = Enum.KeyCode.RightControl,
         MobileButtonsSide = "Left",
+        UnlockMouseWhileOpen = true
     },
     Toggle = {
         Text = "Toggle",
@@ -1100,20 +1101,14 @@ ScreenGui.DescendantRemoving:Connect(function(Instance)
     Library.DPIRegistry[Instance] = nil
 end)
 
-local ModalScreenGui = New("ScreenGui", {
-    Name = "ObsidanModal",
-    DisplayOrder = 999,
-    ResetOnSpawn = false,
-})
-ParentUI(ModalScreenGui, true)
-
 local ModalElement = New("TextButton", {
     BackgroundTransparency = 1,
     Modal = false,
     Size = UDim2.fromScale(0, 0),
+    AnchorPoint = Vector2.zero,
     Text = "",
     ZIndex = -999,
-    Parent = ModalScreenGui,
+    Parent = ScreenGui
 })
 
 --// Cursor
@@ -1828,7 +1823,6 @@ function Library:Unload()
 
     Library.Unloaded = true
     ScreenGui:Destroy()
-    ModalScreenGui:Destroy()
     getgenv().Library = nil
 end
 
@@ -6630,7 +6624,10 @@ function Library:CreateWindow(WindowInfo)
         end
 
         MainFrame.Visible = Library.Toggled
-        ModalElement.Modal = Library.Toggled
+        
+        if WindowInfo.UnlockMouseWhileOpen then
+            ModalElement.Modal = Library.Toggled
+        end
 
         if Library.Toggled and not Library.IsMobile then
             local OldMouseIconEnabled = UserInputService.MouseIconEnabled
@@ -6667,28 +6664,25 @@ function Library:CreateWindow(WindowInfo)
     end
 
     if Library.IsMobile then
-    local ToggleButton = Library:AddDraggableButton("Toggle", function()
-        Library:Toggle()
-    end)
+        local ToggleButton = Library:AddDraggableButton("Toggle", function()
+            Library:Toggle()
+        end)
 
-    local LockButton = Library:AddDraggableButton("Lock", function(self)
-        Library.CantDragForced = not Library.CantDragForced
-        self:SetText(Library.CantDragForced and "Unlock" or "Lock")
-    end)
+        local LockButton = Library:AddDraggableButton("Lock", function(self)
+            Library.CantDragForced = not Library.CantDragForced
+            self:SetText(Library.CantDragForced and "Unlock" or "Lock")
+        end)
 
-    Library.MobileLockButton = LockButton
-    LockButton.Button.Visible = Library.ShowMobileLockButton
+        if WindowInfo.MobileButtonsSide == "Right" then
+            ToggleButton.Button.Position = UDim2.new(1, -6, 0, 6)
+            ToggleButton.Button.AnchorPoint = Vector2.new(1, 0)
 
-    if WindowInfo.MobileButtonsSide == "Right" then
-        ToggleButton.Button.Position = UDim2.new(1, -6, 0, 6)
-        ToggleButton.Button.AnchorPoint = Vector2.new(1, 0)
-
-        LockButton.Button.Position = UDim2.new(1, -6, 0, 46)
-        LockButton.Button.AnchorPoint = Vector2.new(1, 0)
-    else
-        LockButton.Button.Position = UDim2.fromOffset(6, 46)
+            LockButton.Button.Position = UDim2.new(1, -6, 0, 46)
+            LockButton.Button.AnchorPoint = Vector2.new(1, 0)
+        else
+            LockButton.Button.Position = UDim2.fromOffset(6, 46)
+        end
     end
-end
 
     --// Execution \\--
     SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
