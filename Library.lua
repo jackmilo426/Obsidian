@@ -16,7 +16,7 @@ end
 local setclipboard = setclipboard or nil
 local protectgui = protectgui or (syn and syn.protect_gui) or function() end
 local gethui = gethui or function()
-    return CoreGui
+    return PlayerGui
 end
 
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
@@ -1061,7 +1061,7 @@ end
 local function SafeParentUI(Instance: Instance, Parent: Instance | () -> Instance)
     local success, _error = pcall(function()
         if not Parent then
-            Parent = CoreGui
+            Parent = PlayerGui
         end
 
         local DestinationParent
@@ -1081,7 +1081,7 @@ end
 
 local function ParentUI(UI: Instance, SkipHiddenUI: boolean?)
     if SkipHiddenUI then
-        SafeParentUI(UI, CoreGui)
+        SafeParentUI(UI, PlayerGui)
         return
     end
 
