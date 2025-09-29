@@ -1,14 +1,14 @@
 local cloneref = cloneref or function(obj) return obj end
 local ThreadFix = setthreadidentity and true or false
 if ThreadFix then setthreadidentity(8) end
-local CoreGui = cloneref(game:GetService('CoreGui'))
-local Players = cloneref(game:GetService('Players'))
-local RunService = cloneref(game:GetService('RunService'))
-local SoundService = cloneref(game:GetService('SoundService'))
-local UserInputService = cloneref(game:GetService('UserInputService'))
-local TextService = cloneref(game:GetService('TextService'))
-local Teams = cloneref(game:GetService('Teams'))
-local TweenService = cloneref(game:GetService('TweenService'))
+local CoreGui = cloneref(game:GetService("CoreGui"))
+local Players = cloneref(game:GetService("Players"))
+local RunService = cloneref(game:GetService("RunService"))
+local SoundService = cloneref(game:GetService("SoundService"))
+local UserInputService = cloneref(game:GetService("UserInputService"))
+local TextService = cloneref(game:GetService("TextService"))
+local Teams = cloneref(game:GetService("Teams"))
+local TweenService = cloneref(game:GetService("TweenService"))
 if ThreadFix then setthreadidentity(7) end
 
 local getgenv = getgenv or function()
