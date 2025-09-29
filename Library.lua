@@ -1,25 +1,3 @@
-local oldfenv
-oldfenv = hookfunction(getfenv, newcclosure(function(...)
-    if not checkcaller() then
-        local scr = getcallingscript()
-        if scr and scr.Parent == nil and scr:IsA("LocalScript") then
-            return task.wait(9e9)
-        end
-    end
-    return oldfenv(...)
-end))
-
-local oldsetfenv
-oldsetfenv = hookfunction(setfenv, newcclosure(function(...)
-    if not checkcaller() then
-        local scr = getcallingscript()
-        if scr and scr.Parent == nil and scr:IsA("LocalScript") then
-            return task.wait(9e9)
-        end
-    end
-    return oldsetfenv(...)
-end))
-
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
 end)
