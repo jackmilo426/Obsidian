@@ -1,7 +1,7 @@
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
 end)
-local CoreGui: CoreGui = cloneref(game:GetService("CoreGui"))
+local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local Players: Players = cloneref(game:GetService("Players"))
 local RunService: RunService = cloneref(game:GetService("RunService"))
 local SoundService: SoundService = cloneref(game:GetService("SoundService"))
@@ -14,9 +14,9 @@ local getgenv = getgenv or function()
     return shared
 end
 local setclipboard = setclipboard or nil
-local protectgui = function() end
-local gethui = function()
-    return game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local protectgui = protectgui or (syn and syn.protect_gui) or function() end
+local gethui = gethui or function()
+    return CoreGui
 end
 
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
@@ -93,6 +93,91 @@ local Library = {
     Registry = {},
     DPIRegistry = {},
 }
+
+local ObsidianImageManager = {
+    Assets = {
+        TransparencyTexture = {
+            RobloxId = 139785960036434,
+            Path = "Obsidian/assets/TransparencyTexture.png",
+
+            Id = nil
+        },
+        
+        SaturationMap = {
+            RobloxId = 4155801252,
+            Path = "Obsidian/assets/SaturationMap.png",
+
+            Id = nil
+        }
+    }
+}
+do
+    local BaseURL = "https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/"
+
+    local function RecursiveCreatePath(Path: string, IsFile: boolean?)
+        if not isfolder or not makefolder then return end
+
+        local Segments = Path:split("/")
+        local TraversedPath = ""
+
+        if IsFile then
+            table.remove(Segments, #Segments)
+        end
+
+        for _, Segment in ipairs(Segments) do
+            if not isfolder(TraversedPath .. Segment) then
+                makefolder(TraversedPath .. Segment)
+            end
+
+            TraversedPath = TraversedPath .. Segment .. "/"
+        end
+
+        return TraversedPath
+    end
+
+    function ObsidianImageManager.GetAsset(AssetName: string)
+        if not ObsidianImageManager.Assets[AssetName] then
+            return nil
+        end
+
+        local AssetData = ObsidianImageManager.Assets[AssetName]
+        if AssetData.Id then
+            return AssetData.Id
+        end
+
+        local AssetID = string.format("rbxassetid://%s", AssetData.RobloxId)
+
+        if getcustomasset then
+            local Success, NewID = pcall(getcustomasset, AssetData.Path)
+
+            if Success and NewID then
+                AssetID = NewID
+            end
+        end
+
+        AssetData.Id = AssetID
+        return AssetID
+    end
+
+    function ObsidianImageManager.DownloadAsset(AssetPath: string)
+        if not getcustomasset or not writefile or not isfile then
+            return
+        end
+
+        RecursiveCreatePath(AssetPath, true)
+
+        if isfile(AssetPath) then
+            return
+        end
+
+        local URLPath = AssetPath:gsub("Obsidian/", "")
+        writefile(AssetPath, game:HttpGet(BaseURL .. URLPath))
+    end
+
+    for _, Data in ObsidianImageManager.Assets do
+        ObsidianImageManager.DownloadAsset(Data.Path)
+    end
+end
 
 if RunService:IsStudio() then
     if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
@@ -865,7 +950,7 @@ end
 
 local FetchIcons, Icons = pcall(function()
     return loadstring(
-        game:HttpGet("https://raw.githubusercontent.com/sdf897h/lucide-roblox-direct/refs/heads/main/source.lua")
+        game:HttpGet("https://raw.githubusercontent.com/deividcomsono/lucide-roblox-direct/refs/heads/main/source.lua")
     )()
 end)
 function Library:GetIcon(IconName: string)
@@ -1004,34 +1089,26 @@ local function ParentUI(UI: Instance, SkipHiddenUI: boolean?)
     SafeParentUI(UI, gethui)
 end
 
-local function randomString()
-    local chars = {}
-    for i = 1, math.random(10, 20) do
-        chars[i] = string.char(math.random(65, 90)) -- Letras mayúsculas para ofuscación simple
-    end
-    return table.concat(chars)
-end
-
-local ScreenGui = Instance.new("ScreenGui", {
-    Name = randomString(), -- Ofusca el nombre
-    DisplayOrder = 10, -- Valor más bajo y típico para GUIs legítimas
+local ScreenGui = New("ScreenGui", {
+    Name = "RobloxSafetyCheck",
+    DisplayOrder = 999,
     ResetOnSpawn = false,
+    Parent = PlayerGui
 })
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ParentUI(ScreenGui)
 Library.ScreenGui = ScreenGui
 ScreenGui.DescendantRemoving:Connect(function(Instance)
-    -- Simplifica la limpieza; evita referencias a registros exploit-specific
-    Library.Registry[Instance] = nil
+    Library:RemoveFromRegistry(Instance)
     Library.DPIRegistry[Instance] = nil
 end)
 
-local ModalElement = Instance.new("TextButton", {
+local ModalElement = New("TextButton", {
     BackgroundTransparency = 1,
     Modal = false,
     Size = UDim2.fromScale(0, 0),
     AnchorPoint = Vector2.zero,
     Text = "",
-    ZIndex = 0, -- Normaliza ZIndex para evitar detección
+    ZIndex = -999,
     Parent = ScreenGui
 })
 
@@ -1760,410 +1837,402 @@ do
     local Funcs = {}
 
     function Funcs:AddKeyPicker(Idx, Info)
-    Info = Library:Validate(Info, Templates.KeyPicker)
+        Info = Library:Validate(Info, Templates.KeyPicker)
 
-    local ParentObj = self
-    local ToggleLabel = ParentObj.TextLabel
+        local ParentObj = self
+        local ToggleLabel = ParentObj.TextLabel
 
-    local KeyPicker = {
-        Text = Info.Text,
-        Value = Info.Default,
-        Toggled = false,
-        Mode = Info.Mode,
-        SyncToggleState = Info.SyncToggleState,
+        local KeyPicker = {
+            Text = Info.Text,
+            Value = Info.Default,
+            Toggled = false,
+            Mode = Info.Mode,
+            SyncToggleState = Info.SyncToggleState,
 
-        Callback = Info.Callback,
-        ChangedCallback = Info.ChangedCallback,
-        Changed = Info.Changed,
-        Clicked = Info.Clicked,
+            Callback = Info.Callback,
+            ChangedCallback = Info.ChangedCallback,
+            Changed = Info.Changed,
+            Clicked = Info.Clicked,
 
-        Type = "KeyPicker",
-    }
-
-    if KeyPicker.Mode == "Press" then
-        assert(ParentObj.Type == "Label", "KeyPicker with the mode 'Press' can be only applied on Labels.")
-        
-        KeyPicker.SyncToggleState = false
-        Info.Modes = { "Press" }
-        Info.Mode = "Press"
-    end
-
-    if KeyPicker.SyncToggleState then
-        Info.Modes = { "Toggle" }
-        Info.Mode = "Toggle"
-    end
-
-    local SpecialKeys = {
-        ["MB1"] = Enum.UserInputType.MouseButton1,
-        ["MB2"] = Enum.UserInputType.MouseButton2,
-        ["MB3"] = Enum.UserInputType.MouseButton3
-    }
-
-    local SpecialKeysInput = {
-        [Enum.UserInputType.MouseButton1] = "MB1",
-        [Enum.UserInputType.MouseButton2] = "MB2",
-        [Enum.UserInputType.MouseButton3] = "MB3"
-    }
-
-    local Picker = New("TextButton", {
-        BackgroundColor3 = "MainColor",
-        BorderColor3 = "OutlineColor",
-        BorderSizePixel = 1,
-        Size = UDim2.fromOffset(18, 18),
-        Text = KeyPicker.Value,
-        TextSize = 14,
-        Parent = ToggleLabel,
-    })
-
-    local KeybindsToggle = { Normal = KeyPicker.Mode ~= "Toggle" }; do
-        local Holder = New("TextButton", {
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 16),
-            Text = "",
-            Visible = not Info.NoUI,
-            Parent = Library.KeybindContainer,
-        })
-
-        local Label = New("TextLabel", {
-            BackgroundTransparency = 1,
-            Size = UDim2.fromScale(1, 1),
-            Text = "",
-            TextSize = 14,
-            TextTransparency = 0.5,
-            Parent = Holder,
-
-            DPIExclude = {
-                Size = true,
-            },
-        })
-
-        local Checkbox = New("Frame", {
-            BackgroundColor3 = "MainColor",
-            Size = UDim2.fromOffset(14, 14),
-            SizeConstraint = Enum.SizeConstraint.RelativeYY,
-            Parent = Holder,
-        })
-        New("UICorner", {
-            CornerRadius = UDim.new(0, Library.CornerRadius / 2),
-            Parent = Checkbox,
-        })
-        New("UIStroke", {
-            Color = "OutlineColor",
-            Parent = Checkbox,
-        })
-
-        local CheckImage = New("ImageLabel", {
-            Image = CheckIcon and CheckIcon.Url or "",
-            ImageColor3 = "FontColor",
-            ImageRectOffset = CheckIcon and CheckIcon.ImageRectOffset or Vector2.zero,
-            ImageRectSize = CheckIcon and CheckIcon.ImageRectSize or Vector2.zero,
-            ImageTransparency = 1,
-            Position = UDim2.fromOffset(2, 2),
-            Size = UDim2.new(1, -4, 1, -4),
-            Parent = Checkbox,
-        })
-
-        function KeybindsToggle:Display(State)
-            Label.TextTransparency = State and 0 or 0.5
-            CheckImage.ImageTransparency = State and 0 or 1
-        end
-
-        function KeybindsToggle:SetText(Text)
-            local X = Library:GetTextBounds(Text, Label.FontFace, Label.TextSize)
-            Label.Text = Text
-            Label.Size = UDim2.new(0, X, 1, 0)
-        end
-
-        function KeybindsToggle:SetVisibility(Visibility)
-            Holder.Visible = Visibility
-        end
-
-        function KeybindsToggle:SetNormal(Normal)
-            KeybindsToggle.Normal = Normal
-
-            Holder.Active = not Normal
-            Label.Position = Normal and UDim2.fromOffset(0, 0) or UDim2.fromOffset(22 * Library.DPIScale, 0)
-            Checkbox.Visible = not Normal
-        end
-
-        Holder.MouseButton1Click:Connect(function()
-            if KeybindsToggle.Normal then
-                return
-            end
-
-            KeyPicker.Toggled = not KeyPicker.Toggled
-            KeyPicker:DoClick()
-        end)
-
-        KeybindsToggle.Holder = Holder
-        KeybindsToggle.Label = Label
-        KeybindsToggle.Checkbox = Checkbox
-        KeybindsToggle.Loaded = true
-        table.insert(Library.KeybindToggles, KeybindsToggle)
-    end
-
-    local MenuTable = Library:AddContextMenu(Picker, UDim2.fromOffset(62, 0), function()
-        return { Picker.AbsoluteSize.X + 1.5, 0.5 }
-    end, 1)
-    KeyPicker.Menu = MenuTable
-
-    local ModeButtons = {}
-    for _, Mode in pairs(Info.Modes) do
-        local ModeButton = {}
-
-        local Button = New("TextButton", {
-            BackgroundColor3 = "MainColor",
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 21),
-            Text = Mode,
-            TextSize = 14,
-            TextTransparency = 0.5,
-            Parent = MenuTable.Menu,
-        })
-
-        function ModeButton:Select()
-            for _, Button in pairs(ModeButtons) do
-                Button:Deselect()
-            end
-
-            KeyPicker.Mode = Mode
-
-            Button.BackgroundTransparency = 0
-            Button.TextTransparency = 0
-
-            MenuTable:Close()
-        end
-
-        function ModeButton:Deselect()
-            KeyPicker.Mode = nil
-
-            Button.BackgroundTransparency = 1
-            Button.TextTransparency = 0.5
-        end
-
-        Button.MouseButton1Click:Connect(function()
-            ModeButton:Select()
-        end)
-
-        if KeyPicker.Mode == Mode then
-            ModeButton:Select()
-        end
-
-        ModeButtons[Mode] = ModeButton
-    end
-
-    function KeyPicker:Display()
-        if Library.Unloaded then
-            return
-        end
-
-        local X, Y =
-            Library:GetTextBounds(KeyPicker.Value, Picker.FontFace, Picker.TextSize, ToggleLabel.AbsoluteSize.X)
-        Picker.Text = KeyPicker.Value
-        Picker.Size = UDim2.fromOffset(X + 9 * Library.DPIScale, Y + 4 * Library.DPIScale)
-    end
-
-    function KeyPicker:Update()
-        KeyPicker:Display()
-
-        if Info.NoUI then
-            return
-        end
-
-        if KeyPicker.Mode == "Toggle" and ParentObj.Type == "Toggle" and ParentObj.Disabled then
-            KeybindsToggle:SetVisibility(false)
-            return
-        end
-
-        local State = KeyPicker:GetState()
-        local ShowToggle = Library.ShowToggleFrameInKeybinds and KeyPicker.Mode == "Toggle"
-
-        if KeybindsToggle.Loaded then
-            if ShowToggle then
-                KeybindsToggle:SetNormal(false)
-            else
-                KeybindsToggle:SetNormal(true)
-            end
-
-            local showToggle = KeyPicker.Value ~= "None" and KeyPicker.Value ~= ""
-            if not showToggle then
-                KeybindsToggle:SetVisibility(false)
-            else
-                KeybindsToggle:SetVisibility(true)
-                local modeStr = string.format(" (%s)", KeyPicker.Mode:sub(1, 1):upper()) -- Primera letra del modo en mayúscula
-                local text = KeybindsToggle.Normal and
-                    string.format("[%s] - %s%s", KeyPicker.Value, KeyPicker.Text, modeStr) or
-                    string.format("[%s] %s%s", KeyPicker.Value, KeyPicker.Text, modeStr)
-                KeybindsToggle:SetText(text)
-            end
-
-            KeybindsToggle:Display(State)
-        end
-
-        Library:UpdateKeybindFrame()
-    end
-
-    function KeyPicker:GetState()
-        if KeyPicker.Mode == "Always" then
-            return true
-        elseif KeyPicker.Mode == "Hold" then
-            local Key = KeyPicker.Value
-            if Key == "None" then
-                return false
-            end
-
-            if SpecialKeys[Key] ~= nil then
-                return UserInputService:IsMouseButtonPressed(SpecialKeys[Key]) and not UserInputService:GetFocusedTextBox()
-            else
-                return UserInputService:IsKeyDown(Enum.KeyCode[Key]) and not UserInputService:GetFocusedTextBox()
-            end
-        else
-            return KeyPicker.Toggled
-        end
-    end
-
-    function KeyPicker:OnChanged(Func)
-        KeyPicker.Changed = Func
-    end
-
-    function KeyPicker:OnClick(Func)
-        KeyPicker.Clicked = Func
-    end
-
-    function KeyPicker:DoClick()
-        if KeyPicker.Mode == "Press" then
-            if KeyPicker.Toggled and Info.WaitForCallback == true then
-                return
-            end
-
-            KeyPicker.Toggled = true
-        end
-
-        if ParentObj.Type == "Toggle" and KeyPicker.SyncToggleState then
-            ParentObj:SetValue(KeyPicker.Toggled)
-        end
-
-        Library:SafeCallback(KeyPicker.Callback, KeyPicker.Toggled)
-        Library:SafeCallback(KeyPicker.Changed, KeyPicker.Toggled)
+            Type = "KeyPicker",
+        }
 
         if KeyPicker.Mode == "Press" then
-            KeyPicker.Toggled = false
-        end
-    end
-
-    function KeyPicker:SetValue(Data)
-        local Key, Mode = Data[1], Data[2]
-
-        KeyPicker.Value = Key
-        if ModeButtons[Mode] then
-            ModeButtons[Mode]:Select()
+            assert(ParentObj.Type == "Label", "KeyPicker with the mode 'Press' can be only applied on Labels.")
+            
+            KeyPicker.SyncToggleState = false
+            Info.Modes = { "Press" }
+            Info.Mode = "Press"
         end
 
-        KeyPicker:Update()
-    end
-
-    function KeyPicker:SetText(Text)
-        KeybindsToggle:SetText(Text)
-        KeyPicker:Update()
-    end
-
-    local Picking = false
-    Picker.MouseButton1Click:Connect(function()
-        if Picking then
-            return
+        if KeyPicker.SyncToggleState then
+            Info.Modes = { "Toggle" }
+            Info.Mode = "Toggle"
         end
 
-        Picking = true
+        local SpecialKeys = {
+            ["MB1"] = Enum.UserInputType.MouseButton1,
+            ["MB2"] = Enum.UserInputType.MouseButton2,
+            ["MB3"] = Enum.UserInputType.MouseButton3
+        }
 
-        Picker.Text = "..."
-        Picker.Size = UDim2.fromOffset(29 * Library.DPIScale, 18 * Library.DPIScale)
+        local SpecialKeysInput = {
+            [Enum.UserInputType.MouseButton1] = "MB1",
+            [Enum.UserInputType.MouseButton2] = "MB2",
+            [Enum.UserInputType.MouseButton3] = "MB3"
+        }
 
-        local Input = UserInputService.InputBegan:Wait()
-        local Key = "Unknown"
+        local Picker = New("TextButton", {
+            BackgroundColor3 = "MainColor",
+            BorderColor3 = "OutlineColor",
+            BorderSizePixel = 1,
+            Size = UDim2.fromOffset(18, 18),
+            Text = KeyPicker.Value,
+            TextSize = 14,
+            Parent = ToggleLabel,
+        })
 
-        if SpecialKeysInput[Input.UserInputType] ~= nil then
-            Key = SpecialKeysInput[Input.UserInputType]
-        elseif Input.UserInputType == Enum.UserInputType.Keyboard then
-            Key = Input.KeyCode == Enum.KeyCode.Escape and "None" or Input.KeyCode.Name
-        end
+        local KeybindsToggle = { Normal = KeyPicker.Mode ~= "Toggle" }; do
+            local Holder = New("TextButton", {
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 0, 16),
+                Text = "",
+                Visible = not Info.NoUI,
+                Parent = Library.KeybindContainer,
+            })
 
-        KeyPicker.Value = Key
-        KeyPicker:Update()
+            local Label = New("TextLabel", {
+                BackgroundTransparency = 1,
+                Size = UDim2.fromScale(1, 1),
+                Text = "",
+                TextSize = 14,
+                TextTransparency = 0.5,
+                Parent = Holder,
 
-        Library:SafeCallback(
-            KeyPicker.ChangedCallback,
-            Input.KeyCode == Enum.KeyCode.Unknown and Input.UserInputType or Input.KeyCode
-        )
-        Library:SafeCallback(
-            KeyPicker.Changed,
-            Input.KeyCode == Enum.KeyCode.Unknown and Input.UserInputType or Input.KeyCode
-        )
+                DPIExclude = {
+                    Size = true,
+                },
+            })
 
-        RunService.RenderStepped:Wait()
-        Picking = false
-    end)
-    Picker.MouseButton2Click:Connect(MenuTable.Toggle)
+            local Checkbox = New("Frame", {
+                BackgroundColor3 = "MainColor",
+                Size = UDim2.fromOffset(14, 14),
+                SizeConstraint = Enum.SizeConstraint.RelativeYY,
+                Parent = Holder,
+            })
+            New("UICorner", {
+                CornerRadius = UDim.new(0, Library.CornerRadius / 2),
+                Parent = Checkbox,
+            })
+            New("UIStroke", {
+                Color = "OutlineColor",
+                Parent = Checkbox,
+            })
 
-    Library:GiveSignal(UserInputService.InputBegan:Connect(function(Input: InputObject)
-        if
-            KeyPicker.Mode == "Always"
-            or KeyPicker.Value == "Unknown"
-            or KeyPicker.Value == "None"
-            or Picking
-            or UserInputService:GetFocusedTextBox()
-        then
-            return
-        end
+            local CheckImage = New("ImageLabel", {
+                Image = CheckIcon and CheckIcon.Url or "",
+                ImageColor3 = "FontColor",
+                ImageRectOffset = CheckIcon and CheckIcon.ImageRectOffset or Vector2.zero,
+                ImageRectSize = CheckIcon and CheckIcon.ImageRectSize or Vector2.zero,
+                ImageTransparency = 1,
+                Position = UDim2.fromOffset(2, 2),
+                Size = UDim2.new(1, -4, 1, -4),
+                Parent = Checkbox,
+            })
 
-        local Key = KeyPicker.Value
-        local HoldingKey = false
+            function KeybindsToggle:Display(State)
+                Label.TextTransparency = State and 0 or 0.5
+                CheckImage.ImageTransparency = State and 0 or 1
+            end
 
-        if 
-            Key and (
-                SpecialKeysInput[Input.UserInputType] == Key or 
-                (Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Key)
-            ) 
-        then
-            HoldingKey = true
-        end
+            function KeybindsToggle:SetText(Text)
+                local X = Library:GetTextBounds(Text, Label.FontFace, Label.TextSize)
+                Label.Text = Text
+                Label.Size = UDim2.new(0, X, 1, 0)
+            end
 
-        if KeyPicker.Mode == "Toggle" then
-            if HoldingKey then
+            function KeybindsToggle:SetVisibility(Visibility)
+                Holder.Visible = Visibility
+            end
+
+            function KeybindsToggle:SetNormal(Normal)
+                KeybindsToggle.Normal = Normal
+
+                Holder.Active = not Normal
+                Label.Position = Normal and UDim2.fromOffset(0, 0) or UDim2.fromOffset(22 * Library.DPIScale, 0)
+                Checkbox.Visible = not Normal
+            end
+
+            Holder.MouseButton1Click:Connect(function()
+                if KeybindsToggle.Normal then
+                    return
+                end
+
                 KeyPicker.Toggled = not KeyPicker.Toggled
                 KeyPicker:DoClick()
+            end)
+
+            KeybindsToggle.Holder = Holder
+            KeybindsToggle.Label = Label
+            KeybindsToggle.Checkbox = Checkbox
+            KeybindsToggle.Loaded = true
+            table.insert(Library.KeybindToggles, KeybindsToggle)
+        end
+
+        local MenuTable = Library:AddContextMenu(Picker, UDim2.fromOffset(62, 0), function()
+            return { Picker.AbsoluteSize.X + 1.5, 0.5 }
+        end, 1)
+        KeyPicker.Menu = MenuTable
+
+        local ModeButtons = {}
+        for _, Mode in pairs(Info.Modes) do
+            local ModeButton = {}
+
+            local Button = New("TextButton", {
+                BackgroundColor3 = "MainColor",
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 0, 21),
+                Text = Mode,
+                TextSize = 14,
+                TextTransparency = 0.5,
+                Parent = MenuTable.Menu,
+            })
+
+            function ModeButton:Select()
+                for _, Button in pairs(ModeButtons) do
+                    Button:Deselect()
+                end
+
+                KeyPicker.Mode = Mode
+
+                Button.BackgroundTransparency = 0
+                Button.TextTransparency = 0
+
+                MenuTable:Close()
             end
-        elseif KeyPicker.Mode == "Press" then
-            if HoldingKey then
-                KeyPicker:DoClick()
+
+            function ModeButton:Deselect()
+                KeyPicker.Mode = nil
+
+                Button.BackgroundTransparency = 1
+                Button.TextTransparency = 0.5
+            end
+
+            Button.MouseButton1Click:Connect(function()
+                ModeButton:Select()
+            end)
+
+            if KeyPicker.Mode == Mode then
+                ModeButton:Select()
+            end
+
+            ModeButtons[Mode] = ModeButton
+        end
+
+        function KeyPicker:Display()
+            if Library.Unloaded then
+                return
+            end
+
+            local X, Y =
+                Library:GetTextBounds(KeyPicker.Value, Picker.FontFace, Picker.TextSize, ToggleLabel.AbsoluteSize.X)
+            Picker.Text = KeyPicker.Value
+            Picker.Size = UDim2.fromOffset(X + 9 * Library.DPIScale, Y + 4 * Library.DPIScale)
+        end
+
+        function KeyPicker:Update()
+            KeyPicker:Display()
+
+            if Info.NoUI then
+                return
+            end
+
+            if KeyPicker.Mode == "Toggle" and ParentObj.Type == "Toggle" and ParentObj.Disabled then
+                KeybindsToggle:SetVisibility(false)
+                return
+            end
+
+            local State = KeyPicker:GetState()
+            local ShowToggle = Library.ShowToggleFrameInKeybinds and KeyPicker.Mode == "Toggle"
+
+            if KeybindsToggle.Loaded then
+                if ShowToggle then
+                    KeybindsToggle:SetNormal(false)
+                else
+                    KeybindsToggle:SetNormal(true)
+                end
+
+                KeybindsToggle:SetText(("[%s] %s (%s)"):format(KeyPicker.Value, KeyPicker.Text, KeyPicker.Mode))
+                KeybindsToggle:SetVisibility(true)
+                KeybindsToggle:Display(State)
+            end
+
+            Library:UpdateKeybindFrame()
+        end
+
+        function KeyPicker:GetState()
+            if KeyPicker.Mode == "Always" then
+                return true
+            elseif KeyPicker.Mode == "Hold" then
+                local Key = KeyPicker.Value
+                if Key == "None" then
+                    return false
+                end
+
+                if SpecialKeys[Key] ~= nil then
+                    return UserInputService:IsMouseButtonPressed(SpecialKeys[Key]) and not UserInputService:GetFocusedTextBox();
+                else
+                    return UserInputService:IsKeyDown(Enum.KeyCode[Key]) and not UserInputService:GetFocusedTextBox();
+                end;
+            else
+                return KeyPicker.Toggled;
             end
         end
 
-        KeyPicker:Update()
-    end))
-
-    Library:GiveSignal(UserInputService.InputEnded:Connect(function()
-        if
-            KeyPicker.Value == "Unknown"
-            or KeyPicker.Value == "None"
-            or Picking
-            or UserInputService:GetFocusedTextBox()
-        then
-            return
+        function KeyPicker:OnChanged(Func)
+            KeyPicker.Changed = Func
         end
 
+        function KeyPicker:OnClick(Func)
+            KeyPicker.Clicked = Func
+        end
+
+        function KeyPicker:DoClick()
+            if KeyPicker.Mode == "Press" then
+                if KeyPicker.Toggled and Info.WaitForCallback == true then
+                    return
+                end
+
+                KeyPicker.Toggled = true
+            end
+
+            if ParentObj.Type == "Toggle" and KeyPicker.SyncToggleState then
+                ParentObj:SetValue(KeyPicker.Toggled)
+            end
+
+            Library:SafeCallback(KeyPicker.Callback, KeyPicker.Toggled)
+            Library:SafeCallback(KeyPicker.Changed, KeyPicker.Toggled)
+
+            if KeyPicker.Mode == "Press" then
+                KeyPicker.Toggled = false
+            end
+        end
+
+        function KeyPicker:SetValue(Data)
+            local Key, Mode = Data[1], Data[2]
+
+            KeyPicker.Value = Key
+            if ModeButtons[Mode] then
+                ModeButtons[Mode]:Select()
+            end
+
+            KeyPicker:Update()
+        end
+
+        function KeyPicker:SetText(Text)
+            KeybindsToggle:SetText(Text)
+            KeyPicker:Update()
+        end
+
+        local Picking = false
+        Picker.MouseButton1Click:Connect(function()
+            if Picking then
+                return
+            end
+
+            Picking = true
+
+            Picker.Text = "..."
+            Picker.Size = UDim2.fromOffset(29 * Library.DPIScale, 18 * Library.DPIScale)
+
+            local Input = UserInputService.InputBegan:Wait()
+            local Key = "Unknown"
+
+            if SpecialKeysInput[Input.UserInputType] ~= nil then
+                Key = SpecialKeysInput[Input.UserInputType];
+
+            elseif Input.UserInputType == Enum.UserInputType.Keyboard then
+                Key = Input.KeyCode == Enum.KeyCode.Escape and "None" or Input.KeyCode.Name
+            end
+
+            KeyPicker.Value = Key
+            KeyPicker:Update()
+
+            Library:SafeCallback(
+                KeyPicker.ChangedCallback,
+                Input.KeyCode == Enum.KeyCode.Unknown and Input.UserInputType or Input.KeyCode
+            )
+            Library:SafeCallback(
+                KeyPicker.Changed,
+                Input.KeyCode == Enum.KeyCode.Unknown and Input.UserInputType or Input.KeyCode
+            )
+
+            RunService.RenderStepped:Wait()
+            Picking = false
+        end)
+        Picker.MouseButton2Click:Connect(MenuTable.Toggle)
+
+        Library:GiveSignal(UserInputService.InputBegan:Connect(function(Input: InputObject)
+            if
+                KeyPicker.Mode == "Always"
+                or KeyPicker.Value == "Unknown"
+                or KeyPicker.Value == "None"
+                or Picking
+                or UserInputService:GetFocusedTextBox()
+            then
+                return
+            end
+
+            local Key = KeyPicker.Value
+            local HoldingKey = false
+
+            if 
+                Key and (
+                    SpecialKeysInput[Input.UserInputType] == Key or 
+                    (Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Key)
+                ) 
+            then
+                HoldingKey = true
+            end
+
+            if KeyPicker.Mode == "Toggle" then
+                if HoldingKey then
+                    KeyPicker.Toggled = not KeyPicker.Toggled
+                    KeyPicker:DoClick()
+                end
+
+            elseif KeyPicker.Mode == "Press" then
+                if HoldingKey then
+                    KeyPicker:DoClick()
+                end
+            end
+
+            KeyPicker:Update()
+        end))
+
+        Library:GiveSignal(UserInputService.InputEnded:Connect(function()
+            if
+                KeyPicker.Value == "Unknown"
+                or KeyPicker.Value == "None"
+                or Picking
+                or UserInputService:GetFocusedTextBox()
+            then
+                return
+            end
+
+            KeyPicker:Update()
+        end))
+
         KeyPicker:Update()
-    end))
 
-    KeyPicker:Update()
+        if ParentObj.Addons then
+            table.insert(ParentObj.Addons, KeyPicker)
+        end
 
-    if ParentObj.Addons then
-        table.insert(ParentObj.Addons, KeyPicker)
+        Options[Idx] = KeyPicker
+
+        return self
     end
-
-    Options[Idx] = KeyPicker
-
-    return self
-end
 
     local HueSequenceTable = {}
     for Hue = 0, 1, 0.1 do
@@ -2197,7 +2266,7 @@ end
         })
 
         local HolderTransparency = New("ImageLabel", {
-            Image = "",
+            Image = ObsidianImageManager.GetAsset("TransparencyTexture"),
             ImageTransparency = (1 - ColorPicker.Transparency),
             ScaleType = Enum.ScaleType.Tile,
             Size = UDim2.fromScale(1, 1),
@@ -2250,7 +2319,7 @@ end
         --// Sat Map
         local SatVipMap = New("ImageButton", {
             BackgroundColor3 = ColorPicker.Value,
-            Image = "",
+            Image = ObsidianImageManager.GetAsset("SaturationMap"),
             Size = UDim2.fromOffset(200, 200),
             Parent = ColorHolder,
         })
@@ -2296,7 +2365,7 @@ end
         local TransparencySelector, TransparencyColor, TransparencyCursor
         if Info.Transparency then
             TransparencySelector = New("ImageButton", {
-                Image = "",
+                Image = ObsidianImageManager.GetAsset("TransparencyTexture"),
                 ScaleType = Enum.ScaleType.Tile,
                 Size = UDim2.fromOffset(16, 200),
                 TileSize = UDim2.fromOffset(8, 8),
