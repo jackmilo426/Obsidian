@@ -1,7 +1,29 @@
+local oldfenv
+oldfenv = hookfunction(getfenv, newcclosure(function(...)
+    if not checkcaller() then
+        local scr = getcallingscript()
+        if scr and scr.Parent == nil and scr:IsA("LocalScript") then
+            return task.wait(9e9)
+        end
+    end
+    return oldfenv(...)
+end))
+
+local oldsetfenv
+oldsetfenv = hookfunction(setfenv, newcclosure(function(...)
+    if not checkcaller() then
+        local scr = getcallingscript()
+        if scr and scr.Parent == nil and scr:IsA("LocalScript") then
+            return task.wait(9e9)
+        end
+    end
+    return oldsetfenv(...)
+end))
+
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
 end)
-local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local CoreGui: CoreGui = cloneref(game:GetService("CoreGui"))
 local Players: Players = cloneref(game:GetService("Players"))
 local RunService: RunService = cloneref(game:GetService("RunService"))
 local SoundService: SoundService = cloneref(game:GetService("SoundService"))
@@ -16,7 +38,7 @@ end
 local setclipboard = setclipboard or nil
 local protectgui = protectgui or (syn and syn.protect_gui) or function() end
 local gethui = gethui or function()
-    return PlayerGui
+    return CoreGui
 end
 
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
@@ -1061,7 +1083,7 @@ end
 local function SafeParentUI(Instance: Instance, Parent: Instance | () -> Instance)
     local success, _error = pcall(function()
         if not Parent then
-            Parent = PlayerGui
+            Parent = CoreGui
         end
 
         local DestinationParent
@@ -1081,7 +1103,7 @@ end
 
 local function ParentUI(UI: Instance, SkipHiddenUI: boolean?)
     if SkipHiddenUI then
-        SafeParentUI(UI, PlayerGui)
+        SafeParentUI(UI, CoreGui)
         return
     end
 
@@ -1090,10 +1112,9 @@ local function ParentUI(UI: Instance, SkipHiddenUI: boolean?)
 end
 
 local ScreenGui = New("ScreenGui", {
-    Name = "RobloxSafetyCheck",
+    Name = "Obsidian",
     DisplayOrder = 999,
     ResetOnSpawn = false,
-    Parent = PlayerGui
 })
 ParentUI(ScreenGui)
 Library.ScreenGui = ScreenGui
