@@ -1004,25 +1004,34 @@ local function ParentUI(UI: Instance, SkipHiddenUI: boolean?)
     SafeParentUI(UI, gethui)
 end
 
-local ScreenGui = New("ScreenGui", {
-    Name = "Obsidian",
-    DisplayOrder = 999,
+local function randomString()
+    local chars = {}
+    for i = 1, math.random(10, 20) do
+        chars[i] = string.char(math.random(65, 90)) -- Letras mayúsculas para ofuscación simple
+    end
+    return table.concat(chars)
+end
+
+local ScreenGui = Instance.new("ScreenGui", {
+    Name = randomString(), -- Ofusca el nombre
+    DisplayOrder = 10, -- Valor más bajo y típico para GUIs legítimas
     ResetOnSpawn = false,
 })
-Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 Library.ScreenGui = ScreenGui
 ScreenGui.DescendantRemoving:Connect(function(Instance)
-    Library:RemoveFromRegistry(Instance)
+    -- Simplifica la limpieza; evita referencias a registros exploit-specific
+    Library.Registry[Instance] = nil
     Library.DPIRegistry[Instance] = nil
 end)
 
-local ModalElement = New("TextButton", {
+local ModalElement = Instance.new("TextButton", {
     BackgroundTransparency = 1,
     Modal = false,
     Size = UDim2.fromScale(0, 0),
     AnchorPoint = Vector2.zero,
     Text = "",
-    ZIndex = -999,
+    ZIndex = 0, -- Normaliza ZIndex para evitar detección
     Parent = ScreenGui
 })
 
