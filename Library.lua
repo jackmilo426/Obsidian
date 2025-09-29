@@ -1,14 +1,15 @@
-local cloneref = (cloneref or clonereference or function(instance: any)
-    return instance
-end)
-local CoreGui: CoreGui = cloneref(game:GetService("CoreGui"))
-local Players: Players = cloneref(game:GetService("Players"))
-local RunService: RunService = cloneref(game:GetService("RunService"))
-local SoundService: SoundService = cloneref(game:GetService("SoundService"))
-local UserInputService: UserInputService = cloneref(game:GetService("UserInputService"))
-local TextService: TextService = cloneref(game:GetService("TextService"))
-local Teams: Teams = cloneref(game:GetService("Teams"))
-local TweenService: TweenService = cloneref(game:GetService("TweenService"))
+local cloneref = cloneref or function(obj) return obj end
+local ThreadFix = setthreadidentity and true or false
+if ThreadFix then setthreadidentity(8) end
+local CoreGui = cloneref(game:GetService('CoreGui'))
+local Players = cloneref(game:GetService('Players'))
+local RunService = cloneref(game:GetService('RunService'))
+local SoundService = cloneref(game:GetService('SoundService'))
+local UserInputService = cloneref(game:GetService('UserInputService'))
+local TextService = cloneref(game:GetService('TextService'))
+local Teams = cloneref(game:GetService('Teams'))
+local TweenService = cloneref(game:GetService('TweenService'))
+if ThreadFix then setthreadidentity(7) end
 
 local getgenv = getgenv or function()
     return shared
@@ -2172,38 +2173,36 @@ do
         Picker.MouseButton2Click:Connect(MenuTable.Toggle)
 
         Library:GiveSignal(UserInputService.InputBegan:Connect(function(Input: InputObject)
-            if
-                KeyPicker.Mode == "Always"
-                or KeyPicker.Value == "Unknown"
-                or KeyPicker.Value == "None"
-                or Picking
-                or UserInputService:GetFocusedTextBox()
-            then
-                return
+    if not inputService:GetFocusedTextBox() and Input.KeyCode ~= Enum.KeyCode.Unknown then
+        if
+            KeyPicker.Mode == "Always"
+            or KeyPicker.Value == "Unknown"
+            or KeyPicker.Value == "None"
+            or Picking
+        then
+            return
+        end
+
+        local Key = KeyPicker.Value
+        local HoldingKey = false
+
+        if 
+            Key and (
+                SpecialKeysInput[Input.UserInputType] == Key or 
+                (Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Key)
+            ) 
+        then
+            HoldingKey = true
+        end
+
+        if KeyPicker.Mode == "Toggle" then
+            if HoldingKey then
+                KeyPicker.Toggled = not KeyPicker.Toggled
+                KeyPicker:DoClick()
             end
-
-            local Key = KeyPicker.Value
-            local HoldingKey = false
-
-            if 
-                Key and (
-                    SpecialKeysInput[Input.UserInputType] == Key or 
-                    (Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Key)
-                ) 
-            then
-                HoldingKey = true
-            end
-
-            if KeyPicker.Mode == "Toggle" then
-                if HoldingKey then
-                    KeyPicker.Toggled = not KeyPicker.Toggled
-                    KeyPicker:DoClick()
-                end
-
-            elseif KeyPicker.Mode == "Press" then
-                if HoldingKey then
-                    KeyPicker:DoClick()
-                end
+        end
+    end
+end))
             end
 
             KeyPicker:Update()
@@ -6477,47 +6476,53 @@ function Library:CreateWindow(WindowInfo)
     end
 
     function Library:Toggle(Value: boolean?)
-        if typeof(Value) == "boolean" then
-            Library.Toggled = Value
-        else
-            Library.Toggled = not Library.Toggled
-        end
+    local ThreadFix = setthreadidentity and true or false
+    if ThreadFix then setthreadidentity(8) end
 
-        MainFrame.Visible = Library.Toggled
-        
-        if WindowInfo.UnlockMouseWhileOpen then
-            ModalElement.Modal = Library.Toggled
-        end
+    if typeof(Value) == "boolean" then
+        Library.Toggled = Value
+    else
+        Library.Toggled = not Library.Toggled
+    end
 
-        if Library.Toggled and not Library.IsMobile then
-            local OldMouseIconEnabled = UserInputService.MouseIconEnabled
-            pcall(function()
-                RunService:UnbindFromRenderStep("ShowCursor")
-            end)
-            RunService:BindToRenderStep("ShowCursor", Enum.RenderPriority.Last.Value, function()
+    MainFrame.Visible = Library.Toggled
+    
+    if WindowInfo.UnlockMouseWhileOpen then
+        ModalElement.Modal = Library.Toggled
+    end
+
+    if Library.Toggled and not Library.IsMobile then
+        local OldMouseIconEnabled = UserInputService.MouseIconEnabled
+        pcall(function()
+            RunService:UnbindFromRenderStep("ShowCursor")
+        end)
+        RunService:BindToRenderStep("ShowCursor", Enum.RenderPriority.Last.Value, function()
+            if not inputService:GetFocusedTextBox() then
                 UserInputService.MouseIconEnabled = not Library.ShowCustomCursor
-
                 Cursor.Position = UDim2.fromOffset(Mouse.X, Mouse.Y)
                 Cursor.Visible = Library.ShowCustomCursor
+            end
 
-                if not (Library.Toggled and ScreenGui and ScreenGui.Parent) then
-                    UserInputService.MouseIconEnabled = OldMouseIconEnabled
-                    Cursor.Visible = false
-                    RunService:UnbindFromRenderStep("ShowCursor")
-                end
-            end)
-        elseif not Library.Toggled then
-            TooltipLabel.Visible = false
-            for _, Option in pairs(Library.Options) do
-                if Option.Type == "ColorPicker" then
-                    Option.ColorMenu:Close()
-                    Option.ContextMenu:Close()
-                elseif Option.Type == "Dropdown" or Option.Type == "KeyPicker" then
-                    Option.Menu:Close()
-                end
+            if not (Library.Toggled and ScreenGui and ScreenGui.Parent) then
+                UserInputService.MouseIconEnabled = OldMouseIconEnabled
+                Cursor.Visible = false
+                RunService:UnbindFromRenderStep("ShowCursor")
+            end
+        end)
+    elseif not Library.Toggled then
+        TooltipLabel.Visible = false
+        for _, Option in pairs(Library.Options) do
+            if Option.Type == "ColorPicker" then
+                Option.ColorMenu:Close()
+                Option.ContextMenu:Close()
+            elseif Option.Type == "Dropdown" or Option.Type == "KeyPicker" then
+                Option.Menu:Close()
             end
         end
     end
+
+    if ThreadFix then setthreadidentity(7) end
+end
 
     if WindowInfo.AutoShow then
         task.spawn(Library.Toggle)
