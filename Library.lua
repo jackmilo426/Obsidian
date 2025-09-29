@@ -14,9 +14,9 @@ local getgenv = getgenv or function()
     return shared
 end
 local setclipboard = setclipboard or nil
-local protectgui = protectgui or (syn and syn.protect_gui) or function() end
-local gethui = gethui or function()
-    return CoreGui
+local protectgui = function() end
+local gethui = function()
+    return game.Players.LocalPlayer:WaitForChild("PlayerGui")
 end
 
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
@@ -1009,7 +1009,7 @@ local ScreenGui = New("ScreenGui", {
     DisplayOrder = 999,
     ResetOnSpawn = false,
 })
-ParentUI(ScreenGui)
+Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 Library.ScreenGui = ScreenGui
 ScreenGui.DescendantRemoving:Connect(function(Instance)
     Library:RemoveFromRegistry(Instance)
