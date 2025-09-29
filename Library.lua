@@ -20,7 +20,21 @@ local gethui = gethui or function()
 end
 
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
-local Mouse = cloneref(LocalPlayer:GetMouse())
+
+local Mouse
+if game.PlaceId == 125009265613167 or game.PlaceId == 122816944483266 then
+	Mouse = setrawmetatable({}, {
+		__index = function(_, k)
+			if k == "X" then
+				return UserInputService:GetMouseLocation().X
+			elseif k == "Y" then
+				return UserInputService:GetMouseLocation().Y
+			end
+		end
+	})
+else
+	Mouse = cloneref(LocalPlayer:GetMouse())
+end
 
 local Labels = {}
 local Buttons = {}
